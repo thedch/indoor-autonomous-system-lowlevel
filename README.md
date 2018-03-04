@@ -4,9 +4,9 @@
 
 The Indoor Autonmous System Software is contained within three repositories. 
 
-1. indoor-autonomous-system-cloud
-1. indoor-autonomous-system-highlevel
-1. indoor-autonomous-system-lowlevel
+1. [indoor-autonomous-system-cloud](https://github.com/thedch/indoor-autonomous-system-cloud)
+1. [indoor-autonomous-system-highlevel](https://github.com/thedch/indoor-autonomous-system-highlevel)
+1. [indoor-autonomous-system-lowlevel](https://github.com/thedch/indoor-autonomous-system-lowlevel)
 
 The cloud repository contains code to run the front facing Flask server on GCE. This presents the user with a control panel containing destinations inside the floor plan, and a kill switch.
 
