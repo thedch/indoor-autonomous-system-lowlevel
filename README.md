@@ -13,3 +13,9 @@ The cloud repository contains code to run the front facing Flask server on GCE. 
 The high level repository contains ROS code that runs on a Raspberry Pi. This deals with the ROS navigation stack, manual control of the robot, interfacing with the LiDAR, the cloud server, and the low level micro. 
 
 The low level repository contains C++ code that interfaces directly with the sensors and motors to control the direction of the robot and read wheel odometry and IMU data. This data is then passed back to the Raspberry Pi where it is processed by ROS. 
+
+## Motors.h 
+Dependecies:
+Used to read pulses from encoders.
+1. Encoders.h(https://github.com/PaulStoffregen/Encoder)
+Motors.h is the API used to read or reset cumulative encoder pulses from the left and right encoders and convert them to cumulative angle. The encoder values are publish to ROS to use for localization and path correction.
