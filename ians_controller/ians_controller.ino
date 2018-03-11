@@ -15,6 +15,15 @@
 #define RIGHT_ENCODER_PIN1 31
 #define RIGHT_ENCODER_PIN2 34
 
+//MOTOR FUNCTIONS & VARIABLES 
+Motors motors(RIGHT_PWM_PIN,RIGHT_MOTOR_EN1,RIGHT_MOTOR_EN2,LEFT_PWM_PIN,LEFT_MOTOR_EN1,LEFT_MOTOR_EN2);
+Encoder leftEnc(LEFT_ENCODER_PIN1,LEFT_ENCODER_PIN2);
+Encoder rightEnc(RIGHT_ENCODER_PIN1,RIGHT_ENCODER_PIN2);
+int16_t lencVal = 0;
+int16_t rencVal = 0;
+std_msgs::Int16 test1;
+std_msgs::Int16 test2;
+
 //ROS FUNCTIONS & VARIABLES
 ros::NodeHandle nh;
 std_msgs::Int16 lwheel_msg, rwheel_msg;
@@ -22,29 +31,30 @@ ros::Publisher lwheel("lwheel", &lwheel_msg);
 ros::Publisher rwheel("rwheel", &rwheel_msg);
 void rosEncoderPublisher();
 
-//MOTOR FUNCTIONS & VARIABLES 
-Motors motors(RIGHT_PWM_PIN,RIGHT_MOTOR_EN1,RIGHT_MOTOR_EN2,LEFT_PWM_PIN,LEFT_MOTOR_EN1,LEFT_MOTOR_EN2);
-Encoder leftEnc(LEFT_ENCODER_PIN1,LEFT_ENCODER_PIN2);
-Encoder rightEnc(RIGHT_ENCODER_PIN1,RIGHT_ENCODER_PIN2);
-int16_t lencVal = 0;
-int16_t rencVal = 0;
+void messageCb( const std_msgs::Int16& msg){
+  digitalWrite(13, HIGH-digitalRead(13));
+}
+ros::Subscriber<std_msgs::Int16> motor_sub("lmotor", &messageCb);
 
  
 void setup() {
   Serial.begin(9600);
+  pinMode(13, OUTPUT);
   nh.initNode();
   nh.advertise(lwheel);
   nh.advertise(rwheel);
+  nh.subscribe(motor_sub);
 }
 
+
 void loop() {
-//  motors.rightMotorForward(255);
-//  motors.leftMotorReverse(150);
-//  delay(1000);
-//  motors.rightMotorReverse(150);
-//  motors.leftMotorForward(255);
-//  delay(1000);
-  rosEncoderPublisher();
+  motors.leftMotorForward(255);
+  motors.rightMotorForward(100);
+  delay(1000);
+  motors.leftMotorReverse(100);
+  motors.rightMotorReverse(255);
+  delay(1000);
+//  nh.spinOnce();
 }
 
 

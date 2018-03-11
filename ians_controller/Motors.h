@@ -28,15 +28,16 @@ void resetEncoders();
 class Motors
 {
   private:
+    int Int16ToPWM(std_msgs::Int16 motorSpeed);
     int rpwmPin;
-    int rmEn1;
-    int rmEn2;
+    int rmDirec1;
+    int rmDirec2;
     int lpwmPin;
-    int lmEn1;
-    int lmEn2;    
+    int lmDirec1;
+    int lmDirec2;   
   
   public:
-    Motors(int rightPwmPin,int rightMotorEn1,int rightMotorEn2,int leftPwmPin, int leftMotorEn1, int leftMotorEn2);
+    Motors(int rightPwmPin,int rightMotorDirectionPin1,int rightMotorDirectionPin2,int leftPwmPin, int leftMotorDirectionPin1, int leftMotorDirectionPin2);
     void rightMotorForward(int motorSpeed);
     void rightMotorReverse(int motorSpeed);
     void leftMotorForward(int motorSpeed);
