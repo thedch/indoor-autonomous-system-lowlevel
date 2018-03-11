@@ -1,6 +1,7 @@
 #include "Motors.h"
 #include <ros.h>
 #include <std_msgs/Int16.h>
+#include <std_msgs/Float32.h>
 #include <Encoder.h>
 
 //Motor Pin Defines
@@ -32,16 +33,32 @@ ros::Publisher lwheel("lwheel", &lwheel_msg);
 ros::Publisher rwheel("rwheel", &rwheel_msg);
 void rosEncoderPublisher();
 
-void lmotorSub( const std_msgs::Int16& msg){
-  motors.leftMotorForward(msg);
+void lmotorSub( const std_msgs::Float32& msg){
+//  motors.leftMotorForward(msg);
+  if(msg.data > 0){
+    motors.leftMotorForward(msg);
+  }
+  else if(msg.data < 0){
+    std_msgs::Float32 temp;
+    temp.data = abs(msg.data);
+    motors.leftMotorReverse(temp);
+  }
 }
 
-void rmotorSub( const std_msgs::Int16& msg){
-  motors.rightMotorForward(msg);
+void rmotorSub( const std_msgs::Float32& msg){
+//  motors.rightMotorForward(msg);
+  if(msg.data > 0){
+    motors.rightMotorForward(msg);
+  }
+  else if(msg.data < 0){
+    std_msgs::Float32 temp;
+    temp.data = abs(msg.data);
+    motors.rightMotorReverse(temp);
+  }
 }
 
-ros::Subscriber<std_msgs::Int16> lmotor_sub("lmotor", &lmotorSub);
-ros::Subscriber<std_msgs::Int16> rmotor_sub("rmotor", &rmotorSub);
+ros::Subscriber<std_msgs::Float32> lmotor_sub("lmotor", &lmotorSub);
+ros::Subscriber<std_msgs::Float32> rmotor_sub("rmotor", &rmotorSub);
  
 void setup() {
   Serial.begin(9600);
