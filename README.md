@@ -14,6 +14,16 @@ The high level repository contains ROS code that runs on a Raspberry Pi. This de
 
 The low level repository contains C++ code that interfaces directly with the sensors and motors to control the direction of the robot and read wheel odometry and IMU data. This data is then passed back to the Raspberry Pi where it is processed by ROS. 
 
+## Setup
+
+In order to connect the Pi to the Teensy, run the following command:
+
+```
+rosrun rosserial_python serial_node.py /dev/ttyACM[#]
+```
+
+Where the number represents the USB port (usually 0 or 1). An easy way to check that USB port is currently active is `ls /dev | grep ACM`. 
+
 ## Motors.h 
 Dependecies:
 Used to read pulses from encoders.
