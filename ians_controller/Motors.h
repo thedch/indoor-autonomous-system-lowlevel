@@ -2,8 +2,9 @@
   Motors.h - Library for Reading and reseting encoder values
   values from two motors.
   Dependencies : Encoder.h - Used to count pulses of encoders
-  Created by Juan Huerta, Kevin Behr, Kelvin Silva  
+  Created by Juan Huerta, Kevin Beher, Kelvin Silva  
 */
+
 #ifndef MOTORS_H
 #define MOTORS_H
 
@@ -11,16 +12,15 @@
 #include <ros.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/Float32.h>
-#include <Encoder.h>
 
 /*
- Author: Juan Huerta, Kevin Behr
+ Author: Juan Huerta, Kevin Beher
 | Param: None
 | Return: int[] representing the cumulative encoder pulses for each
 |       wheel since last read
 int[] readEncoders();
 
-| Author: Juan Huerta, Kevin Behr
+| Author: Juan Huerta, Kevin Beher
 | Param: None
 | Remark: Reset encoder values to zero
 void resetEncoders();
@@ -29,7 +29,6 @@ void resetEncoders();
 class Motors
 {
   private:
-    int Int16ToPWM(std_msgs::Int16 motorSpeed);
     int rpwmPin;
     int rmDirec1;
     int rmDirec2;
@@ -46,4 +45,3 @@ class Motors
 };
 
 #endif
-
