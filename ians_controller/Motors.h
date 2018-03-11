@@ -28,20 +28,19 @@ void resetEncoders();
 class Motors
 {
   private:
-    Encoder leftEnc;
-    Encoder rightEnc;
-    int oldPositionL;
-    int oldPositionR;
-    int degrees_per_tick;
-    int AngleL;
-    int ticksL;
-    int AngleR;
-    int ticksR;
+    int rpwmPin;
+    int rmEn1;
+    int rmEn2;
+    int lpwmPin;
+    int lmEn1;
+    int lmEn2;    
   
   public:
-    Motors(int lEnc1, int lEnc2, int rEnc1, int rEnc2);
-    int* readEncoders();
-    void resetEncoders();
+    Motors(int rightPwmPin,int rightMotorEn1,int rightMotorEn2,int leftPwmPin, int leftMotorEn1, int leftMotorEn2);
+    void rightMotorForward(int motorSpeed);
+    void rightMotorReverse(int motorSpeed);
+    void leftMotorForward(int motorSpeed);
+    void leftMotorReverse(int motorSpeed);   
 };
 
 #endif

@@ -8,53 +8,44 @@
 
 #include "Arduino.h"
 #include "Motors.h"
-#include <Encoder.h>
 
-Motors::Motors(int lEnc1, int lEnc2, int rEnc1, int rEnc2) : leftEnc(lEnc1, lEnc2), rightEnc(rEnc1, rEnc2){
-//  this->leftEnc(lEnc1, lEnc2);
-  //this->rightEnc(rEnc1, rEnc2);
-  oldPositionL  = -999;
-  oldPositionR  = -999;
-  degrees_per_tick = 15; 
-  AngleL = 0;
-  ticksL = 0;
-  AngleR = 0;
-  ticksR = 0;
+Motors::Motors(int rightPwmPin,int rightMotorEn1,int rightMotorEn2,int leftPwmPin, int leftMotorEn1, int leftMotorEn2){
+  pinMode(rightPwmPin, OUTPUT); //right motor PWM pin
+  pinMode(rightMotorEn1, OUTPUT); //right motor direction en1
+  pinMode(rightMotorEn2, OUTPUT); //right motor direction en2
+  pinMode(leftPwmPin, OUTPUT); //left motor PWM pin
+  pinMode(leftMotorEn1, OUTPUT); //left motor direction en1
+  pinMode(leftMotorEn2, OUTPUT); //left motor direction en2
+  rpwmPin = rightPwmPin;
+  rmEn1 = rightMotorEn1;
+  rmEn2 = rightMotorEn2;
+  lpwmPin = leftPwmPin;
+  lmEn1 = leftMotorEn1;
+  lmEn2 = leftMotorEn2; 
+  
 }
 
-int* Motors::readEncoders(){
-    int* pointer;
-    int encVal[2];
-    pointer = encVal;
-    encVal[0] = leftEnc.read(); //newPosition Left Encoder
-    encVal[1] = rightEnc.read(); //newPosition Right Encoder
-    //update old position of encoders and convert to Angle
-    if (encVal[0] != oldPositionL) {
-      oldPositionL = encVal[0];
-      ticksL = encVal[0]  / 4;
-      AngleL = ticksL * degrees_per_tick;
-    }
-    if (encVal[1] != oldPositionR) {
-      oldPositionR = encVal[1];
-      ticksR = encVal[1]  / 4;
-      AngleR = ticksR * degrees_per_tick;
-    }
-  Serial.print("Basic Encoder Test: ");
-  Serial.print("Left encoder angle: ");
-  Serial.print(AngleL);
-  Serial.print(", Right encoder angle: ");
-  Serial.print(AngleR);
-  Serial.println();
-  return pointer;
+void Motors::rightMotorForward(int motorSpeed){
+  analogWrite(rpwmPin,motorSpeed);
+  digitalWrite(rmEn1,LOW);
+  digitalWrite(rmEn2,HIGH);
 }
 
-void Motors::resetEncoders(){
-    //reset encoder values
-    leftEnc.write(0);
-    rightEnc.write(0);
-    //digitalWrite(13,HIGH);
-    ticksL = 0;           
-    ticksR = 0;
-    AngleL = 0;
-    AngleR = 0;
+void Motors::rightMotorReverse(int motorSpeed){
+  analogWrite(rpwmPin,motorSpeed);
+  digitalWrite(rmEn1,HIGH);
+  digitalWrite(rmEn2,LOW);
 }
+
+void Motors::leftMotorForward(int motorSpeed){
+  analogWrite(lpwmPin,motorSpeed);
+  digitalWrite(lmEn1,LOW);
+  digitalWrite(lmEn2,HIGH);
+}
+
+void Motors::leftMotorReverse(int motorSpeed){
+  analogWrite(lpwmPin,motorSpeed);
+  digitalWrite(lmEn1,HIGH);
+  digitalWrite(lmEn2,LOW);
+}
+
