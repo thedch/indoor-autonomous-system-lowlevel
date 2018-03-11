@@ -41,15 +41,15 @@ void Motors::rightMotorReverse(std_msgs::Int16 motorSpeed){
 void Motors::leftMotorForward(std_msgs::Int16 motorSpeed){
   int pwmSpeed = Int16ToPWM(motorSpeed);
   analogWrite(lpwmPin,pwmSpeed);
-  digitalWrite(lmDirec1,LOW);
-  digitalWrite(lmDirec2,HIGH);
+  digitalWrite(lmDirec1,HIGH);
+  digitalWrite(lmDirec2,LOW);
 }
 
 void Motors::leftMotorReverse(std_msgs::Int16 motorSpeed){
   int pwmSpeed = Int16ToPWM(motorSpeed);
   analogWrite(lpwmPin,pwmSpeed);
-  digitalWrite(lmDirec1,HIGH);
-  digitalWrite(lmDirec2,LOW);
+  digitalWrite(lmDirec1,LOW);
+  digitalWrite(lmDirec2,HIGH);
 }
 
 int Motors::Int16ToPWM(std_msgs::Int16 motorSpeed){

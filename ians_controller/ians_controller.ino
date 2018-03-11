@@ -33,12 +33,15 @@ ros::Publisher rwheel("rwheel", &rwheel_msg);
 void rosEncoderPublisher();
 
 void lmotorSub( const std_msgs::Int16& msg){
-  digitalWrite(13, HIGH-digitalRead(13));
-  motorGo = 1;
-  test1.data = 30000;
+  motors.leftMotorForward(msg);
 }
 
-ros::Subscriber<std_msgs::Int16> motor_sub("lmotor", &lmotorSub);
+void rmotorSub( const std_msgs::Int16& msg){
+  motors.rightMotorForward(msg);
+}
+
+ros::Subscriber<std_msgs::Int16> lmotor_sub("lmotor", &lmotorSub);
+ros::Subscriber<std_msgs::Int16> rmotor_sub("rmotor", &rmotorSub);
  
 void setup() {
   Serial.begin(9600);
@@ -46,7 +49,8 @@ void setup() {
   nh.initNode();
   nh.advertise(lwheel);
   nh.advertise(rwheel);
-  nh.subscribe(motor_sub);
+  nh.subscribe(lmotor_sub);
+  nh.subscribe(rmotor_sub);
 }
 
 
@@ -65,17 +69,6 @@ void loop() {
 //  test1.data = -20000;
 //  motors.leftMotorReverse(test1);
 //  motors.rightMotorReverse(test1);
-//  delay(1000);
-
-if(motorGo == 1){
-  motors.leftMotorForward(test1);
-  motors.rightMotorForward(test1);
-//  delay(1000);
-}
-
-//  int testPrint = 0;
-//  testPrint = motors.Int16ToPWM(test1);
-//  Serial.println(testPrint);
 //  delay(1000);
 
   nh.spinOnce();
