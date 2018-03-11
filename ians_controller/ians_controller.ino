@@ -23,6 +23,7 @@ int16_t lencVal = 0;
 int16_t rencVal = 0;
 std_msgs::Int16 test1;
 std_msgs::Int16 test2;
+int motorGo = 0;
 
 //ROS FUNCTIONS & VARIABLES
 ros::NodeHandle nh;
@@ -31,11 +32,13 @@ ros::Publisher lwheel("lwheel", &lwheel_msg);
 ros::Publisher rwheel("rwheel", &rwheel_msg);
 void rosEncoderPublisher();
 
-void messageCb( const std_msgs::Int16& msg){
+void lmotorSub( const std_msgs::Int16& msg){
   digitalWrite(13, HIGH-digitalRead(13));
+  motorGo = 1;
+  test1.data = 30000;
 }
-ros::Subscriber<std_msgs::Int16> motor_sub("lmotor", &messageCb);
 
+ros::Subscriber<std_msgs::Int16> motor_sub("lmotor", &lmotorSub);
  
 void setup() {
   Serial.begin(9600);
@@ -55,22 +58,27 @@ void loop() {
 //  motors.rightMotorReverse(255);
 //  delay(1000);
 
+//  test1.data = 30000;
+//  motors.leftMotorForward(test1);
+//  motors.rightMotorForward(test1);
+//  delay(1000);
+//  test1.data = -20000;
+//  motors.leftMotorReverse(test1);
+//  motors.rightMotorReverse(test1);
+//  delay(1000);
 
-  test1.data = 30000;
+if(motorGo == 1){
   motors.leftMotorForward(test1);
   motors.rightMotorForward(test1);
-  delay(1000);
-  test1.data = -20000;
-  motors.leftMotorReverse(test1);
-  motors.rightMotorReverse(test1);
-  delay(1000);
+//  delay(1000);
+}
 
-//int testPrint = 0;
-//testPrint = motors.Int16ToPWM(test1);
-//Serial.println(testPrint);
-//delay(1000);
+//  int testPrint = 0;
+//  testPrint = motors.Int16ToPWM(test1);
+//  Serial.println(testPrint);
+//  delay(1000);
 
-//  nh.spinOnce();
+  nh.spinOnce();
 }
 
 
