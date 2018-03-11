@@ -23,9 +23,6 @@ Encoder leftEnc(LEFT_ENCODER_PIN1,LEFT_ENCODER_PIN2);
 Encoder rightEnc(RIGHT_ENCODER_PIN1,RIGHT_ENCODER_PIN2);
 int16_t lencVal = 0;
 int16_t rencVal = 0;
-std_msgs::Int16 test1;
-std_msgs::Int16 test2;
-int motorGo = 0;
 
 // ROS FUNCTIONS & VARIABLES
 ros::NodeHandle nh;
