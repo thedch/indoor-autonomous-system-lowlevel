@@ -24,37 +24,35 @@ Motors::Motors(int rightPwmPin,int rightMotorDirectionPin1,int rightMotorDirecti
   lmDirec2 = leftMotorDirectionPin2;   
 }
 
-void Motors::rightMotorForward(int motorSpeed){
-//  int pwmSpeed = Int16ToPWM(motorSpeed);
-  analogWrite(rpwmPin,motorSpeed);
+void Motors::rightMotorForward(std_msgs::Int16 motorSpeed){
+  int pwmSpeed = Int16ToPWM(motorSpeed);
+  analogWrite(rpwmPin,pwmSpeed);
   digitalWrite(rmDirec1,LOW);
   digitalWrite(rmDirec2,HIGH);
 }
 
-void Motors::rightMotorReverse(int motorSpeed){
-//  int pwmSpeed = Int16ToPWM(motorSpeed);
-  analogWrite(rpwmPin,motorSpeed);
+void Motors::rightMotorReverse(std_msgs::Int16 motorSpeed){
+  int pwmSpeed = Int16ToPWM(motorSpeed);
+  analogWrite(rpwmPin,pwmSpeed);
   digitalWrite(rmDirec1,HIGH);
   digitalWrite(rmDirec2,LOW);
 }
 
-void Motors::leftMotorForward(int motorSpeed){
-//  int pwmSpeed = Int16ToPWM(motorSpeed);
-  analogWrite(lpwmPin,motorSpeed);
+void Motors::leftMotorForward(std_msgs::Int16 motorSpeed){
+  int pwmSpeed = Int16ToPWM(motorSpeed);
+  analogWrite(lpwmPin,pwmSpeed);
   digitalWrite(lmDirec1,LOW);
   digitalWrite(lmDirec2,HIGH);
 }
 
-void Motors::leftMotorReverse(int motorSpeed){
-//  int pwmSpeed = Int16ToPWM(motorSpeed);
-  analogWrite(lpwmPin,motorSpeed);
+void Motors::leftMotorReverse(std_msgs::Int16 motorSpeed){
+  int pwmSpeed = Int16ToPWM(motorSpeed);
+  analogWrite(lpwmPin,pwmSpeed);
   digitalWrite(lmDirec1,HIGH);
   digitalWrite(lmDirec2,LOW);
 }
 
 int Motors::Int16ToPWM(std_msgs::Int16 motorSpeed){
-  int temp = 0;
-  temp = ((motorSpeed.data * 256) / 65535);
-  return temp;  
+  return ((motorSpeed.data + 32767) / 256);  
 }
 

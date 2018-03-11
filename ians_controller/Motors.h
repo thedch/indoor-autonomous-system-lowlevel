@@ -38,10 +38,11 @@ class Motors
   
   public:
     Motors(int rightPwmPin,int rightMotorDirectionPin1,int rightMotorDirectionPin2,int leftPwmPin, int leftMotorDirectionPin1, int leftMotorDirectionPin2);
-    void rightMotorForward(int motorSpeed);
-    void rightMotorReverse(int motorSpeed);
-    void leftMotorForward(int motorSpeed);
-    void leftMotorReverse(int motorSpeed);   
+    void rightMotorForward(std_msgs::Int16);
+    void rightMotorReverse(std_msgs::Int16);
+    void leftMotorForward(std_msgs::Int16);
+    void leftMotorReverse(std_msgs::Int16);
+//    int Int16ToPWM(std_msgs::Int16 motorSpeed);     
 };
 
 #endif

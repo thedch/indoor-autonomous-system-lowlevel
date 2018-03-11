@@ -48,12 +48,28 @@ void setup() {
 
 
 void loop() {
-  motors.leftMotorForward(255);
-  motors.rightMotorForward(100);
+//  motors.leftMotorForward(255);
+//  motors.rightMotorForward(100);
+//  delay(1000);
+//  motors.leftMotorReverse(100);
+//  motors.rightMotorReverse(255);
+//  delay(1000);
+
+
+  test1.data = 30000;
+  motors.leftMotorForward(test1);
+  motors.rightMotorForward(test1);
   delay(1000);
-  motors.leftMotorReverse(100);
-  motors.rightMotorReverse(255);
+  test1.data = -20000;
+  motors.leftMotorReverse(test1);
+  motors.rightMotorReverse(test1);
   delay(1000);
+
+//int testPrint = 0;
+//testPrint = motors.Int16ToPWM(test1);
+//Serial.println(testPrint);
+//delay(1000);
+
 //  nh.spinOnce();
 }
 
