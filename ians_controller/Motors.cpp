@@ -3,9 +3,6 @@
   Created by Juan Huerta and Kevin Behr
 */
 
-// Encoder Interface //
-// Kevin Beher, Juan Huerta//
-
 #include "Arduino.h"
 #include "Motors.h"
 
