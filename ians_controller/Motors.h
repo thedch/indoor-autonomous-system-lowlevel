@@ -10,7 +10,7 @@
 
 #include "Arduino.h"
 #include <ros.h>
-#include <std_msgs/Int16.h>
+//#include <std_msgs/Int16.h>
 #include <std_msgs/Float32.h>
 
 /*
@@ -38,10 +38,10 @@ class Motors
   
   public:
     Motors(int rightPwmPin,int rightMotorDirectionPin1,int rightMotorDirectionPin2,int leftPwmPin, int leftMotorDirectionPin1, int leftMotorDirectionPin2);
-    void rightMotorForward(std_msgs::Float32);
-    void rightMotorReverse(std_msgs::Float32);
-    void leftMotorForward(std_msgs::Float32);
-    void leftMotorReverse(std_msgs::Float32);
+    void rightMotorForward(std_msgs::Float32 motorSpeed);
+    void rightMotorReverse(std_msgs::Float32 motorSpeed);
+    void leftMotorForward(std_msgs::Float32 motorSpeed);
+    void leftMotorReverse(std_msgs::Float32 motorSpeed);
     void leftMotorBrake();
     void rightMotorBrake();       
 };
