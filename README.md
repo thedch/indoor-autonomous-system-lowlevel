@@ -24,9 +24,12 @@ rosrun rosserial_python serial_node.py /dev/ttyACM[#]
 
 Where the number represents the USB port (usually 0 or 1). An easy way to check that USB port is currently active is `ls /dev | grep ACM`. 
 
-## Motors.h 
+## ians_controller.ino
+
+
 Dependecies:
 Used to read pulses from encoders.
 1. Encoders.h(https://github.com/PaulStoffregen/Encoder)
 
-Motors.h is the API used to read or reset cumulative encoder pulses from the left and right encoders and convert them to cumulative angle. The encoder values are publish to ROS to use for localization and path correction.
+## Motors.h
+Motors.h is the API used set motor power and direction of the differential drive robot.
