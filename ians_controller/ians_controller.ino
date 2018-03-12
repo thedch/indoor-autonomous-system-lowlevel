@@ -31,31 +31,32 @@ ros::Publisher lwheel("lwheel", &lwheel_msg);
 ros::Publisher rwheel("rwheel", &rwheel_msg);
 void rosEncoderPublisher();
 
-void lmotorSub( const std_msgs::Float32& msg){
+void lmotorCallback(const std_msgs::Float32& msg){
   if(msg.data > 0){
     motors.leftMotorForward(msg);
-  }
-  else if(msg.data < 0){
+  } else if(msg.data < 0){
     std_msgs::Float32 temp;
     temp.data = abs(msg.data);
     motors.leftMotorReverse(temp);
+  } else{
+    motors.leftMotorBrake();
   }
-  // TODO: Add motors_off()
 }
 
-void rmotorSub( const std_msgs::Float32& msg){
+void rmotorCallback(const std_msgs::Float32& msg){
   if(msg.data > 0){
     motors.rightMotorForward(msg);
-  }
-  else if(msg.data < 0){
+  } else if(msg.data < 0){
     std_msgs::Float32 temp;
     temp.data = abs(msg.data);
     motors.rightMotorReverse(temp);
+  } else{
+    motors.rightMotorBrake();
   }
 }
 
-ros::Subscriber<std_msgs::Float32> lmotor_sub("lmotor", &lmotorSub);
-ros::Subscriber<std_msgs::Float32> rmotor_sub("rmotor", &rmotorSub);
+ros::Subscriber<std_msgs::Float32> lmotor_sub("lmotor", &lmotorCallback);
+ros::Subscriber<std_msgs::Float32> rmotor_sub("rmotor", &rmotorCallback);
  
 void setup() {
   Serial.begin(BAUD_RATE);
@@ -70,6 +71,7 @@ void setup() {
 
 void loop() {
   // Sit and spin and wait for message publications from the Pi
+  rosEncoderPublisher();
   nh.spinOnce();
 }
 

@@ -41,7 +41,9 @@ class Motors
     void rightMotorForward(std_msgs::Float32);
     void rightMotorReverse(std_msgs::Float32);
     void leftMotorForward(std_msgs::Float32);
-    void leftMotorReverse(std_msgs::Float32);     
+    void leftMotorReverse(std_msgs::Float32);
+    void leftMotorBrake();
+    void rightMotorBrake();       
 };
 
 #endif

@@ -36,6 +36,12 @@ void Motors::rightMotorReverse(std_msgs::Float32 motorSpeed){
   digitalWrite(rmDirec2, LOW);
 }
 
+void Motors::rightMotorBrake(){
+  analogWrite(rpwmPin, 0);
+  digitalWrite(rmDirec1, LOW);
+  digitalWrite(rmDirec2, LOW);
+}
+
 void Motors::leftMotorForward(std_msgs::Float32 motorSpeed){
   analogWrite(lpwmPin, motorSpeed.data);
   digitalWrite(lmDirec1, HIGH);
@@ -47,3 +53,10 @@ void Motors::leftMotorReverse(std_msgs::Float32 motorSpeed){
   digitalWrite(lmDirec1, LOW);
   digitalWrite(lmDirec2, HIGH);
 }
+
+void Motors::leftMotorBrake(){
+  analogWrite(lpwmPin, 0);
+  digitalWrite(lmDirec1, LOW);
+  digitalWrite(lmDirec2, LOW);
+}
+
