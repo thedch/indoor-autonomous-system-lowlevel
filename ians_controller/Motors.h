@@ -10,7 +10,6 @@
 
 #include "Arduino.h"
 #include <ros.h>
-//#include <std_msgs/Int16.h>
 #include <std_msgs/Float32.h>
 
 /*
