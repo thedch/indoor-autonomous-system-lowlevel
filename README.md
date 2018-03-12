@@ -25,11 +25,33 @@ rosrun rosserial_python serial_node.py /dev/ttyACM[#]
 Where the number represents the USB port (usually 0 or 1). An easy way to check that USB port is currently active is `ls /dev | grep ACM`. 
 
 ## ians_controller.ino
-
+ians_controller.ino is the main file that handles calling the Motors API and the built in ROS and Enocder libraries.
 
 Dependecies:
-Used to read pulses from encoders.
-1. Encoders.h(https://github.com/PaulStoffregen/Encoder)
+
+1. [ros.h](http://wiki.ros.org/roslib)
+1. [Encoders.h](https://github.com/PaulStoffregen/Encoder)
+
+### ros.h
+ros.h is a ROS library for Arduino that is used to set up the ROS functions that subscribe and publish to topics on the ROS system of the Raspberry Pi.
+
+
+### Encoders.h
+Encoders.h is a library made for the Teensy that is used to count pulses from quadrature encoded signals.  
+ians_controller.ino uses the functions:
+
+* **Encoder myEnc(pin1, pin2)** - Creates an Encoder object, using 2 pins. 
+* **myEnc.read()** - Returns the positive or negative accumulated position.
+* **myEnc.write(newPosition)** - Set the position to a new value.
+
 
 ## Motors.h
 Motors.h is the API used set motor power and direction of the differential drive robot.
+
+* **Motors myMotor(rightPwmPin, rightMotorDirectionPin1, rightMotorDirectionPin2, leftPwmPin, leftMotorDirectionPin1, leftMotorDirectionPin2)** - Creates a Motors object using the pins connected from the H-bridge to the Teensy.
+* **myMotor.rightMotorForward(motorSpeed)** - Input it is PWM parameter from 0 - 255
+* **myMotor.rightMotorReverse(motorSpeed)** - Input it is PWM parameter from 0 - 255
+* **myMotor.leftMotorForward(motorSpeed)** - Input it is PWM parameter from 0 - 255
+* **myMotor.leftMotorReverse(motorSpeed)** - Input it is PWM parameter from 0 - 255
+* **myMotor.leftMotorBrake()** - Left Motor brakes
+* **myMotor.rightMotorBrake()** - Right Motor brakes   
