@@ -24,6 +24,14 @@ rosrun rosserial_python serial_node.py /dev/ttyACM[#]
 
 Where the number represents the USB port (usually 0 or 1). An easy way to check that USB port is currently active is `ls /dev | grep ACM`. 
 
+## How To Reset Enocder Values Through ROS
+
+In order to reset encoder values, run the following command:
+
+```
+rostopic pub reset_encoders std_msgs/Empty --once
+```
+
 ## ians_controller.ino
 ians_controller.ino is the main file that handles calling the Motors API and the built in ROS and Enocder libraries.
 
