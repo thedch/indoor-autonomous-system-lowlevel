@@ -4,14 +4,15 @@
 #include <std_msgs/Float32.h>
 #include <std_msgs/Empty.h>
 #include <Encoder.h>
+#include <Arduino.h>
 
 // Motor Pin Defines
-#define RIGHT_PWM_PIN 2
-#define RIGHT_MOTOR_EN1 24
-#define RIGHT_MOTOR_EN2 25
-#define LEFT_PWM_PIN 23
-#define LEFT_MOTOR_EN1 22
-#define LEFT_MOTOR_EN2 21
+#define LEFT_PWM_PIN 2
+#define LEFT_MOTOR_EN1 24
+#define LEFT_MOTOR_EN2 25
+#define RIGHT_PWM_PIN 23
+#define RIGHT_MOTOR_EN1 22
+#define RIGHT_MOTOR_EN2 21
 #define LEFT_ENCODER_PIN1 32
 #define LEFT_ENCODER_PIN2 33
 #define RIGHT_ENCODER_PIN1 34
@@ -49,6 +50,7 @@ void setup() {
   nh.advertise(rwheel);
   nh.subscribe(lmotor_sub);
   nh.subscribe(rmotor_sub);
+  nh.subscribe(reset_encoder_sub);
 }
 
 //Main Loop
@@ -93,4 +95,6 @@ void rmotorCallback(const std_msgs::Float32& msg){
 void encoder_reset_callback(const std_msgs::Empty& reset_msg){
   lencVal = 0;
   rencVal = 0;
+  leftEnc.write(0);
+  rightEnc.write(0);
 }
