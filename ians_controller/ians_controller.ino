@@ -2,6 +2,7 @@
 #include <ros.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Empty.h>
 #include <Encoder.h>
 
 // Motor Pin Defines
@@ -13,8 +14,8 @@
 #define LEFT_MOTOR_EN2 21
 #define LEFT_ENCODER_PIN1 32
 #define LEFT_ENCODER_PIN2 33
-#define RIGHT_ENCODER_PIN1 31
-#define RIGHT_ENCODER_PIN2 34
+#define RIGHT_ENCODER_PIN1 34
+#define RIGHT_ENCODER_PIN2 31
 #define BAUD_RATE 9600
 
 // MOTOR FUNCTIONS & VARIABLES 
@@ -30,6 +31,40 @@ std_msgs::Int16 lwheel_msg, rwheel_msg;
 ros::Publisher lwheel("lwheel", &lwheel_msg);
 ros::Publisher rwheel("rwheel", &rwheel_msg);
 void rosEncoderPublisher();
+
+void lmotorCallback(const std_msgs::Float32& msg);
+void rmotorCallback(const std_msgs::Float32& msg);
+void encoder_reset_callback(const std_msgs::Empty& reset_msg);
+
+ros::Subscriber<std_msgs::Float32> lmotor_sub("lmotor", &lmotorCallback);
+ros::Subscriber<std_msgs::Float32> rmotor_sub("rmotor", &rmotorCallback);
+ros::Subscriber<std_msgs::Empty> reset_encoder_sub("reset_encoders", &encoder_reset_callback);
+
+//ROS Node setup
+void setup() {
+  Serial.begin(BAUD_RATE);
+  // ROS Node Setup
+  nh.initNode();
+  nh.advertise(lwheel);
+  nh.advertise(rwheel);
+  nh.subscribe(lmotor_sub);
+  nh.subscribe(rmotor_sub);
+}
+
+//Main Loop
+void loop() {
+  rosEncoderPublisher();
+  // Sit and spin and wait for message publications from the Pi
+  nh.spinOnce();
+}
+
+void rosEncoderPublisher(){
+  lwheel_msg.data = (leftEnc.read()/4);
+  rwheel_msg.data = (rightEnc.read()/4);
+  lwheel.publish(&lwheel_msg);
+  rwheel.publish(&rwheel_msg);
+  delay(100);
+}
 
 void lmotorCallback(const std_msgs::Float32& msg){
   if(msg.data > 0){
@@ -55,33 +90,7 @@ void rmotorCallback(const std_msgs::Float32& msg){
   }
 }
 
-ros::Subscriber<std_msgs::Float32> lmotor_sub("lmotor", &lmotorCallback);
-ros::Subscriber<std_msgs::Float32> rmotor_sub("rmotor", &rmotorCallback);
- 
-void setup() {
-  Serial.begin(BAUD_RATE);
-  // ROS Node Setup
-  nh.initNode();
-  nh.advertise(lwheel);
-  nh.advertise(rwheel);
-  nh.subscribe(lmotor_sub);
-  nh.subscribe(rmotor_sub);
-}
-
-
-void loop() {
-  // Sit and spin and wait for message publications from the Pi
-  rosEncoderPublisher();
-  nh.spinOnce();
-}
-
-void rosEncoderPublisher(){
-  lencVal = leftEnc.read();
-  rencVal = rightEnc.read();
-  lwheel_msg.data = lencVal/4;
-  lwheel.publish(&lwheel_msg);
-  rwheel_msg.data = rencVal/4;
-  rwheel.publish(&rwheel_msg);
-  nh.spinOnce();
-  delay(100);
+void encoder_reset_callback(const std_msgs::Empty& reset_msg){
+  lencVal = 0;
+  rencVal = 0;
 }
