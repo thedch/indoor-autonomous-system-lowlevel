@@ -6,54 +6,53 @@
 #include "Arduino.h"
 #include "Motors.h"
 
-Motors::Motors(int rightPwmPin,int rightMotorDirectionPin1,int rightMotorDirectionPin2,int leftPwmPin, int leftMotorDirectionPin1, int leftMotorDirectionPin2){
-  pinMode(rightPwmPin, OUTPUT); //right motor PWM pin
-  pinMode(rightMotorDirectionPin1, OUTPUT); //right motor direction en1
-  pinMode(rightMotorDirectionPin2, OUTPUT); //right motor direction en2
-  pinMode(leftPwmPin, OUTPUT); //left motor PWM pin
-  pinMode(leftMotorDirectionPin1, OUTPUT); //left motor direction en1
-  pinMode(leftMotorDirectionPin2, OUTPUT); //left motor direction en2
-  rpwmPin = rightPwmPin;
-  rmDirec1 = rightMotorDirectionPin1;
-  rmDirec2 = rightMotorDirectionPin2;
-  lpwmPin = leftPwmPin;
-  lmDirec1 = leftMotorDirectionPin1;
-  lmDirec2 = leftMotorDirectionPin2;   
+Motors::Motors(int right_pwm_pin, int rmotor_direction_pin1, int rmotor_direction_pin2, int left_pwm_pin, int lmotor_direction_pin1, int lmotor_direction_pin2){
+  pinMode(right_pwm_pin, OUTPUT); //right motor PWM pin
+  pinMode(rmotor_direction_pin1, OUTPUT); //right motor direction en1
+  pinMode(rmotor_direction_pin2, OUTPUT); //right motor direction en2
+  pinMode(left_pwm_pin, OUTPUT); //left motor PWM pin
+  pinMode(lmotor_direction_pin1, OUTPUT); //left motor direction en1
+  pinMode(lmotor_direction_pin2, OUTPUT); //left motor direction en2
+  r_pwm_pin = right_pwm_pin;
+  rm_dir1 = rmotor_direction_pin1;
+  rm_dir2 = rmotor_direction_pin2;
+  l_pwm_pin = left_pwm_pin;
+  lm_dir1 = lmotor_direction_pin1;
+  lm_dir2 = lmotor_direction_pin2;   
 }
 
-void Motors::rightMotorForward(std_msgs::Float32 motorSpeed){
-  analogWrite(rpwmPin, motorSpeed.data);
-  digitalWrite(rmDirec1, LOW);
-  digitalWrite(rmDirec2, HIGH);
+void Motors::right_motor_forward(std_msgs::Float32 motor_speed){
+  analogWrite(r_pwm_pin, motor_speed.data);
+  digitalWrite(rm_dir1, LOW);
+  digitalWrite(rm_dir2, HIGH);
 }
 
-void Motors::rightMotorReverse(std_msgs::Float32 motorSpeed){
-  analogWrite(rpwmPin, motorSpeed.data);
-  digitalWrite(rmDirec1, HIGH);
-  digitalWrite(rmDirec2, LOW);
+void Motors::right_motor_reverse(std_msgs::Float32 motor_speed){
+  analogWrite(r_pwm_pin, motor_speed.data);
+  digitalWrite(rm_dir1, HIGH);
+  digitalWrite(rm_dir2, LOW);
 }
 
-void Motors::rightMotorBrake(){
-  analogWrite(rpwmPin, 0);
-  digitalWrite(rmDirec1, LOW);
-  digitalWrite(rmDirec2, LOW);
+void Motors::right_motor_brake(){
+  analogWrite(r_pwm_pin, 0);
+  digitalWrite(rm_dir1, LOW);
+  digitalWrite(rm_dir2, LOW);
 }
 
-void Motors::leftMotorForward(std_msgs::Float32 motorSpeed){
-  analogWrite(lpwmPin, motorSpeed.data);
-  digitalWrite(lmDirec1, HIGH);
-  digitalWrite(lmDirec2, LOW);
+void Motors::left_motor_forward(std_msgs::Float32 motor_speed){
+  analogWrite(l_pwm_pin, motor_speed.data);
+  digitalWrite(lm_dir1, HIGH);
+  digitalWrite(lm_dir2, LOW);
 }
 
-void Motors::leftMotorReverse(std_msgs::Float32 motorSpeed){
-  analogWrite(lpwmPin, motorSpeed.data);
-  digitalWrite(lmDirec1, LOW);
-  digitalWrite(lmDirec2, HIGH);
+void Motors::left_motor_reverse(std_msgs::Float32 motor_speed){
+  analogWrite(l_pwm_pin, motor_speed.data);
+  digitalWrite(lm_dir1, LOW);
+  digitalWrite(lm_dir2, HIGH);
 }
 
-void Motors::leftMotorBrake(){
-  analogWrite(lpwmPin, 0);
-  digitalWrite(lmDirec1, LOW);
-  digitalWrite(lmDirec2, LOW);
+void Motors::left_motor_brake(){
+  analogWrite(l_pwm_pin, 0);
+  digitalWrite(lm_dir1, LOW);
+  digitalWrite(lm_dir2, LOW);
 }
-

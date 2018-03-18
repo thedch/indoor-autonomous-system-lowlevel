@@ -21,24 +21,24 @@
 
 // MOTOR FUNCTIONS & VARIABLES 
 Motors motors(RIGHT_PWM_PIN,RIGHT_MOTOR_EN1,RIGHT_MOTOR_EN2,LEFT_PWM_PIN,LEFT_MOTOR_EN1,LEFT_MOTOR_EN2);
-Encoder leftEnc(LEFT_ENCODER_PIN1,LEFT_ENCODER_PIN2);
-Encoder rightEnc(RIGHT_ENCODER_PIN1,RIGHT_ENCODER_PIN2);
-int16_t lencVal = 0;
-int16_t rencVal = 0;
+Encoder lmotor_encoder(LEFT_ENCODER_PIN1,LEFT_ENCODER_PIN2);
+Encoder rmotor_encoder(RIGHT_ENCODER_PIN1,RIGHT_ENCODER_PIN2);
+int16_t lenc_val = 0;
+int16_t renc_val = 0;
 
 // ROS FUNCTIONS & VARIABLES
 ros::NodeHandle nh;
 std_msgs::Int16 lwheel_msg, rwheel_msg;
 ros::Publisher lwheel("lwheel", &lwheel_msg);
 ros::Publisher rwheel("rwheel", &rwheel_msg);
-void rosEncoderPublisher();
+void ROS_encoder_publisher();
 
-void lmotorCallback(const std_msgs::Float32& msg);
-void rmotorCallback(const std_msgs::Float32& msg);
+void lmotor_callback(const std_msgs::Float32& msg);
+void rmotor_callback(const std_msgs::Float32& msg);
 void encoder_reset_callback(const std_msgs::Empty& reset_msg);
 
-ros::Subscriber<std_msgs::Float32> lmotor_sub("lmotor", &lmotorCallback);
-ros::Subscriber<std_msgs::Float32> rmotor_sub("rmotor", &rmotorCallback);
+ros::Subscriber<std_msgs::Float32> lmotor_sub("lmotor", &lmotor_callback);
+ros::Subscriber<std_msgs::Float32> rmotor_sub("rmotor", &rmotor_callback);
 ros::Subscriber<std_msgs::Empty> reset_encoder_sub("reset_encoders", &encoder_reset_callback);
 
 //ROS Node setup
@@ -55,46 +55,46 @@ void setup() {
 
 //Main Loop
 void loop() {
-  rosEncoderPublisher();
+  ROS_encoder_publisher();
   // Sit and spin and wait for message publications from the Pi
   nh.spinOnce();
 }
 
-void rosEncoderPublisher(){
-  lwheel_msg.data = (leftEnc.read()/4);
-  rwheel_msg.data = (rightEnc.read()/4);
+void ROS_encoder_publisher(){
+  lwheel_msg.data = (lmotor_encoder.read()/4);
+  rwheel_msg.data = (rmotor_encoder.read()/4);
   lwheel.publish(&lwheel_msg);
   rwheel.publish(&rwheel_msg);
   delay(100);
 }
 
-void lmotorCallback(const std_msgs::Float32& msg){
+void lmotor_callback(const std_msgs::Float32& msg){
   if(msg.data > 0){
-    motors.leftMotorForward(msg);
+    motors.left_motor_forward(msg);
   } else if(msg.data < 0){
     std_msgs::Float32 temp;
     temp.data = abs(msg.data);
-    motors.leftMotorReverse(temp);
+    motors.left_motor_reverse(temp);
   } else{
-    motors.leftMotorBrake();
+    motors.left_motor_brake();
   }
 }
 
-void rmotorCallback(const std_msgs::Float32& msg){
+void rmotor_callback(const std_msgs::Float32& msg){
   if(msg.data > 0){
-    motors.rightMotorForward(msg);
+    motors.right_motor_forward(msg);
   } else if(msg.data < 0){
     std_msgs::Float32 temp;
     temp.data = abs(msg.data);
-    motors.rightMotorReverse(temp);
+    motors.right_motor_reverse(temp);
   } else{
-    motors.rightMotorBrake();
+    motors.right_motor_brake();
   }
 }
 
 void encoder_reset_callback(const std_msgs::Empty& reset_msg){
-  lencVal = 0;
-  rencVal = 0;
-  leftEnc.write(0);
-  rightEnc.write(0);
+  lenc_val = 0;
+  renc_val = 0;
+  lmotor_encoder.write(0);
+  rmotor_encoder.write(0);
 }
