@@ -20,7 +20,6 @@ class PID_velocity
 {
   private:
     int pid_error;
-    int pid_target;
     int pid_motor;
     int pid_vel;
     int pid_intergral;
@@ -47,17 +46,19 @@ class PID_velocity
     // float dt; // This is in seconds!
     int encoder_low_wrap;
     int encoder_high_wrap;
-    // pid_prev_vel = [0.0] * rolling_pts;   
+    // pid_prev_vel = [0.0] * rolling_pts;
+    std::deque<int> pid_prev_vel{std::deque<int>(8,0)};   
   
   
   public:
     PID_velocity();
     void calc_velocity();
     void append_vel(int val);
-    void calc_rolling_vel();
+    float calc_rolling_vel();
     void do_pid();
-    void wheelCallback(int encoder);
-    void targetCallback(msg);
+    void wheelCallback(int enc);
+    void targetCallback(std_msgs::Float32 msg);
+    int pid_target;
 };
 
 #endif

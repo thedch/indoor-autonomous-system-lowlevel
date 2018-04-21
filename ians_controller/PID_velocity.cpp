@@ -1,7 +1,8 @@
 #include "Arduino.h"
-#include "Motors.cpp"
+#include "PID_velocity.h"
 
 PID_velocity::PID_velocity() {
+  Serial.begin(9600);
   pid_error = 0;
   pid_target = 0;
   pid_motor = 0;
@@ -30,7 +31,6 @@ PID_velocity::PID_velocity() {
   encoder_max = 32768;
   encoder_low_wrap = (encoder_max - encoder_min) * 0.3 + encoder_min; // 10k
   encoder_high_wrap = (encoder_max - encoder_min) * 0.7 + encoder_min; // 22k
-  std::deque<int> pid_prev_vel (8,0); 
   // pid_prev_vel = [0.0] * rolling_pts;
   wheel_latest = 0.0;
 }
@@ -48,7 +48,7 @@ void PID_velocity::calc_velocity() {
       // ??
 
   // if we HAVE recent odom data
-  int cur_vel = (wheel_latest - wheel_prev) / dt
+  int cur_vel = (wheel_latest - wheel_prev) / dt;
   append_vel(cur_vel);
   calc_rolling_vel();
   wheel_prev = wheel_latest;
@@ -59,12 +59,12 @@ void PID_velocity::calc_velocity() {
 }
 
 void PID_velocity::append_vel(int val) { // Add velocity to history
-  pid_prev_vel.push_front(val);
-  pid_prev_vel.pop_back();  
+  this->pid_prev_vel.push_front(val);
+  this->pid_prev_vel.pop_back();  
 }
 
-void PID_velocity::calc_rolling_vel() {
-  int sum = 0
+float PID_velocity::calc_rolling_vel() {
+  int sum = 0;
   for (int i = 0; i < pid_prev_vel.size(); i++) {
     sum += pid_prev_vel[i];
   }
@@ -75,41 +75,41 @@ void PID_velocity::calc_rolling_vel() {
 
 void PID_velocity::do_pid() {
   unsigned long pid_dt_duration = millis() - prev_pid_time; 
-  unsigned float pid_dt = pid_dt_duration / 1000;
+  float pid_dt = pid_dt_duration / 1000;
   prev_pid_time = millis();
 
   pid_error = pid_target - pid_vel;
   pid_intergral = pid_intergral + (pid_error * pid_dt); // might need to be pid_dt
-  derivative = (pid_error - pid_previous_error) / pid_dt; // migt need to be pid_dt
+  pid_derivative = (pid_error - pid_previous_error) / pid_dt; // migt need to be pid_dt
   pid_previous_error = pid_error;
 
   pid_motor = (pid_Kp * pid_error) + (pid_Ki * pid_intergral) + (pid_Kd * pid_derivative);
 
   if (pid_motor > out_max){
     pid_motor = out_max;
-    pid_intergral = pid_intergral - (pid_error * pid_dt) //might need to be pid_dt 
+    pid_intergral = pid_intergral - (pid_error * pid_dt); //might need to be pid_dt 
   } else if(pid_motor < out_min){
     pid_motor = out_min;
-    pid_intergral = pid_intergral - (pid_error * pid_dt) //might need to be pid_dt
+    pid_intergral = pid_intergral - (pid_error * pid_dt); //might need to be pid_dt
   } else if(pid_target == 0){
       pid_motor = 0;
   }  
 
-  Serial.Print("Velocity: ");
-  Serial.Print(pid_vel);
-  Serial.Print(" Target: ");
-  Serial.Print(pid_target);
-  Serial.Print(" Error: ");
-  Serial.Print(pid_error);
-  Serial.Print(" Intergral: ");
-  Serial.Print(pid_intergral);
-  Serial.Print(" Derivative: ");
-  Serial.Print(pid_derivative);
-  Serial.Print(" Motor: ");
-  Serial.Print(pid_motor);
+  Serial.print("Velocity: ");
+  Serial.print(pid_vel);
+  Serial.print(" Target: ");
+  Serial.print(pid_target);
+  Serial.print(" Error: ");
+  Serial.print(pid_error);
+  Serial.print(" Intergral: ");
+  Serial.print(pid_intergral);
+  Serial.print(" Derivative: ");
+  Serial.print(pid_derivative);
+  Serial.print(" Motor: ");
+  Serial.print(pid_motor);
 }
 
-void PID_velocity::wheelCallback(enc) {
+void PID_velocity::wheelCallback(int enc) {
   // int enc = msg.data;
   if (enc < encoder_low_wrap && prev_encoder > encoder_high_wrap) {
     wheel_mult++;
@@ -122,9 +122,9 @@ void PID_velocity::wheelCallback(enc) {
   prev_encoder = enc;
 }
 
-void PID_velocity::targetCallback(msg) {
+void PID_velocity::targetCallback(std_msgs::Float32 msg) {
   // When we recieve a geo twist, this happens
-  target = msg.data;
+  pid_target = msg.data;
   calc_velocity();
   do_pid();
 }
