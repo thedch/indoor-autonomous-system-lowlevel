@@ -25,10 +25,11 @@ PID_velocity::PID_velocity() {
   rolling_pts = 2;
   timeout_ticks = 4;
   ticks_per_meter = 20;
-  velocity_threshold = 0.001;
+  // velocity_threshold = 0.001;
   encoder_min = -32768;
   encoder_max = 32768;
-  encoder_low_wrap = (encoder_max - encoder_min) * 0.3 + encoder_min;
+  encoder_low_wrap = (encoder_max - encoder_min) * 0.3 + encoder_min; // 10k
+  encoder_high_wrap = (encoder_max - encoder_min) * 0.7 + encoder_min; // 22k
   std::deque<int> pid_prev_vel (8,0); 
   // pid_prev_vel = [0.0] * rolling_pts;
   wheel_latest = 0.0;
@@ -72,7 +73,7 @@ void PID_velocity::calc_rolling_vel() {
 
 
 
-void do_pid() {
+void PID_velocity::do_pid() {
   unsigned long pid_dt_duration = millis() - prev_pid_time; 
   unsigned float pid_dt = pid_dt_duration / 1000;
   prev_pid_time = millis();
@@ -108,3 +109,22 @@ void do_pid() {
   Serial.Print(pid_motor);
 }
 
+void PID_velocity::wheelCallback(enc) {
+  // int enc = msg.data;
+  if (enc < encoder_low_wrap && prev_encoder > encoder_high_wrap) {
+    wheel_mult++;
+  }
+  if (enc > encoder_high_wrap && prev_encoder < encoder_low_wrap) {
+    wheel_mult--;
+  }
+
+  wheel_latest = 1.0 * (enc + wheel_mult * (encoder_max - encoder_min)) / ticks_per_meter;
+  prev_encoder = enc;
+}
+
+void PID_velocity::targetCallback(msg) {
+  // When we recieve a geo twist, this happens
+  target = msg.data;
+  calc_velocity();
+  do_pid();
+}
