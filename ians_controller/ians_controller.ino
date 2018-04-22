@@ -48,17 +48,16 @@ ros::Subscriber<std_msgs::Float32> lwheel_vtarget_sub("lwheel_vtarget", &lwheel_
 ros::Subscriber<std_msgs::Float32> rwheel_vtarget_sub("rwheel_vtarget", &rwheel_vtarget_callback);
 ros::Subscriber<std_msgs::Empty> reset_encoder_sub("reset_encoders", &encoder_reset_callback);
 
-//ROS Node setup
 void setup() {
   Serial.begin(BAUD_RATE);
   // ROS Node Setup
   nh.initNode();
   nh.advertise(lwheel);
   nh.advertise(rwheel);
-  //nh.subscribe(lmotor_sub);
-  //nh.subscribe(rmotor_sub);
-//  nh.subscribe(lwheel_vtarget_sub);
-//  nh.subscribe(rwheel_vtarget_sub);
+//  nh.subscribe(lmotor_sub);
+//  nh.subscribe(rmotor_sub);
+  nh.subscribe(lwheel_vtarget_sub);
+  nh.subscribe(rwheel_vtarget_sub);
   nh.subscribe(reset_encoder_sub);
 }
 
@@ -74,47 +73,50 @@ void ROS_encoder_publisher(){
   rwheel_msg.data = (rmotor_encoder.read()/4);
 //  lwheel.publish(&lwheel_msg);
 //  rwheel.publish(&rwheel_msg);
-  l_pid.wheelCallback(lwheel_msg.data);
-  r_pid.wheelCallback(rwheel_msg.data);
+//  l_pid.wheelCallback(lwheel_msg.data);
+//  r_pid.wheelCallback(rwheel_msg.data);
 
   delay(100);
 }
 
-void lmotor_callback(const std_msgs::Float32& msg){
-  if(msg.data > 0){
-    motors.left_motor_forward(msg);
-  } else if(msg.data < 0){
-    std_msgs::Float32 temp;
-    temp.data = abs(msg.data);
-    motors.left_motor_reverse(temp);
-  } else{
-    motors.left_motor_brake();
-  }
+// void lmotor_callback(const std_msgs::Float32& msg){
+//   if(msg.data > 0){
+//     motors.left_motor_forward(msg);
+//   } else if(msg.data < 0){
+//     std_msgs::Float32 temp;
+//     temp.data = abs(msg.data);
+//     motors.left_motor_reverse(temp);
+//   } else{
+//     motors.left_motor_brake();
+//   }
+// }
+
+
+// void rmotor_callback(const std_msgs::Float32& msg){
+//   if(msg.data > 0){
+//     motors.right_motor_forward(msg);
+//   } else if(msg.data < 0){
+//     std_msgs::Float32 temp;
+//     temp.data = abs(msg.data);
+//     motors.right_motor_reverse(temp);
+//   } else{
+//     motors.right_motor_brake();
+//   }
+// }
+
+void lwheel_vtarget_callback(const std_msgs::Float32& msg){
+  // l_pid.pid_target = msg.data;
+  // l_pid.calc_velocity();
+  // l_pid.do_pid();
+//  l_pid.pid_spin();
 }
 
-//void lwheel_vtarget_callback(const std_msgs::Float32& msg){
-//  //l_pid.pid_target = msg.data;
-//  l_pid.calc_velocity();
-//  l_pid.do_pid();
-//}
-
-void rmotor_callback(const std_msgs::Float32& msg){
-  if(msg.data > 0){
-    motors.right_motor_forward(msg);
-  } else if(msg.data < 0){
-    std_msgs::Float32 temp;
-    temp.data = abs(msg.data);
-    motors.right_motor_reverse(temp);
-  } else{
-    motors.right_motor_brake();
-  }
-}
-
-//void rwheel_vtarget_callback(const std_msgs::Float32& msg){
-//  //r_pid.pid_target = msg.data;
+void rwheel_vtarget_callback(const std_msgs::Float32& msg){
+//  r_pid.pid_target = msg.data;
 //  r_pid.calc_velocity();
 //  r_pid.do_pid();
-//}
+//  r_pid.pid_spin();
+}
 
 
 void encoder_reset_callback(const std_msgs::Empty& reset_msg){
