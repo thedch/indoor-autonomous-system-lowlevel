@@ -130,6 +130,7 @@ void PID_velocity::pid_spin() {
     pid_previous_error = pid_integral = pid_error = pid_derivative = 0;
 
     std_msgs::Float32 motor_msg;
+    // TODO: ticks_since_target = timeout_ticks, so this loop will never enter?
     while (ticks_since_target < timeout_ticks) {
         calc_velocity();
         do_pid();

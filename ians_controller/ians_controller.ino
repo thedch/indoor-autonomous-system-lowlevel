@@ -122,7 +122,6 @@ void rwheel_vtarget_callback(const std_msgs::Float32& msg) {
   r_pid.pid_spin();
 }
 
-
 void encoder_reset_callback(const std_msgs::Empty& reset_msg) {
   lenc_val = 0;
   renc_val = 0;

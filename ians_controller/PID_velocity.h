@@ -41,8 +41,8 @@ class PID_velocity
         int encoder_max;
         int ticks_since_target;
         unsigned long prev_pid_time;
-        unsigned long then; // This is in milliseconds!
-        // float dt; // This is in seconds!
+        unsigned long then; // This is in milliseconds
+        // float dt; // This is in seconds
         int encoder_low_wrap;
         int encoder_high_wrap;
         int rolling_pts;
