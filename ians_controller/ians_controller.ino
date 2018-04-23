@@ -20,10 +20,10 @@
 #define RIGHT_ENCODER_PIN2 31
 #define BAUD_RATE 9600
 
-// MOTOR FUNCTIONS & VARIABLES 
-Motors motors(RIGHT_PWM_PIN,RIGHT_MOTOR_EN1,RIGHT_MOTOR_EN2,LEFT_PWM_PIN,LEFT_MOTOR_EN1,LEFT_MOTOR_EN2);
-Encoder lmotor_encoder(LEFT_ENCODER_PIN1,LEFT_ENCODER_PIN2);
-Encoder rmotor_encoder(RIGHT_ENCODER_PIN1,RIGHT_ENCODER_PIN2);
+// MOTOR FUNCTIONS & VARIABLES
+Motors motors(RIGHT_PWM_PIN, RIGHT_MOTOR_EN1, RIGHT_MOTOR_EN2, LEFT_PWM_PIN, LEFT_MOTOR_EN1, LEFT_MOTOR_EN2);
+Encoder lmotor_encoder(LEFT_ENCODER_PIN1, LEFT_ENCODER_PIN2);
+Encoder rmotor_encoder(RIGHT_ENCODER_PIN1, RIGHT_ENCODER_PIN2);
 PID_velocity l_pid;
 PID_velocity r_pid;
 int16_t lenc_val = 0;
@@ -36,14 +36,16 @@ ros::Publisher lwheel("lwheel", &lwheel_msg);
 ros::Publisher rwheel("rwheel", &rwheel_msg);
 void ROS_encoder_publisher();
 
-//void lmotor_callback(const std_msgs::Float32& msg);
-//void rmotor_callback(const std_msgs::Float32& msg);
+// Callback headers to be used when a ROS topic publish is received
+void lmotor_callback(const std_msgs::Float32& msg);
+void rmotor_callback(const std_msgs::Float32& msg);
 void lwheel_vtarget_callback(const std_msgs::Float32& msg);
 void rwheel_vtarget_callback(const std_msgs::Float32& msg);
 void encoder_reset_callback(const std_msgs::Empty& reset_msg);
 
-//ros::Subscriber<std_msgs::Float32> lmotor_sub("lmotor", &lmotor_callback);
-//ros::Subscriber<std_msgs::Float32> rmotor_sub("rmotor", &rmotor_callback);
+// Subscribers to ROS topics
+ros::Subscriber<std_msgs::Float32> lmotor_sub("lmotor", &lmotor_callback);
+ros::Subscriber<std_msgs::Float32> rmotor_sub("rmotor", &rmotor_callback);
 ros::Subscriber<std_msgs::Float32> lwheel_vtarget_sub("lwheel_vtarget", &lwheel_vtarget_callback);
 ros::Subscriber<std_msgs::Float32> rwheel_vtarget_sub("rwheel_vtarget", &rwheel_vtarget_callback);
 ros::Subscriber<std_msgs::Empty> reset_encoder_sub("reset_encoders", &encoder_reset_callback);
@@ -54,72 +56,72 @@ void setup() {
   nh.initNode();
   nh.advertise(lwheel);
   nh.advertise(rwheel);
-//  nh.subscribe(lmotor_sub);
-//  nh.subscribe(rmotor_sub);
+  nh.subscribe(lmotor_sub);
+  nh.subscribe(rmotor_sub);
   nh.subscribe(lwheel_vtarget_sub);
   nh.subscribe(rwheel_vtarget_sub);
   nh.subscribe(reset_encoder_sub);
 }
 
-//Main Loop
+// Main Loop
 void loop() {
   ROS_encoder_publisher();
   // Sit and spin and wait for message publications from the Pi
   nh.spinOnce();
 }
 
-void ROS_encoder_publisher(){
-  lwheel_msg.data = (lmotor_encoder.read()/4);
-  rwheel_msg.data = (rmotor_encoder.read()/4);
-//  lwheel.publish(&lwheel_msg);
-//  rwheel.publish(&rwheel_msg);
-//  l_pid.wheelCallback(lwheel_msg.data);
-//  r_pid.wheelCallback(rwheel_msg.data);
+void ROS_encoder_publisher() {
+  lwheel_msg.data = (lmotor_encoder.read() / 4);
+  rwheel_msg.data = (rmotor_encoder.read() / 4);
+  lwheel.publish(&lwheel_msg);
+  rwheel.publish(&rwheel_msg);
+  l_pid.wheelCallback(lwheel_msg.data);
+  r_pid.wheelCallback(rwheel_msg.data);
 
   delay(100);
 }
 
-// void lmotor_callback(const std_msgs::Float32& msg){
-//   if(msg.data > 0){
-//     motors.left_motor_forward(msg);
-//   } else if(msg.data < 0){
-//     std_msgs::Float32 temp;
-//     temp.data = abs(msg.data);
-//     motors.left_motor_reverse(temp);
-//   } else{
-//     motors.left_motor_brake();
-//   }
-// }
-
-
-// void rmotor_callback(const std_msgs::Float32& msg){
-//   if(msg.data > 0){
-//     motors.right_motor_forward(msg);
-//   } else if(msg.data < 0){
-//     std_msgs::Float32 temp;
-//     temp.data = abs(msg.data);
-//     motors.right_motor_reverse(temp);
-//   } else{
-//     motors.right_motor_brake();
-//   }
-// }
-
-void lwheel_vtarget_callback(const std_msgs::Float32& msg){
-  // l_pid.pid_target = msg.data;
-  // l_pid.calc_velocity();
-  // l_pid.do_pid();
-//  l_pid.pid_spin();
-}
-
-void rwheel_vtarget_callback(const std_msgs::Float32& msg){
-//  r_pid.pid_target = msg.data;
-//  r_pid.calc_velocity();
-//  r_pid.do_pid();
-//  r_pid.pid_spin();
+void lmotor_callback(const std_msgs::Float32& msg) {
+  if (msg.data > 0) {
+    motors.left_motor_forward(msg);
+  } else if (msg.data < 0) {
+    std_msgs::Float32 temp;
+    temp.data = abs(msg.data);
+    motors.left_motor_reverse(temp);
+  } else {
+    motors.left_motor_brake();
+  }
 }
 
 
-void encoder_reset_callback(const std_msgs::Empty& reset_msg){
+void rmotor_callback(const std_msgs::Float32& msg) {
+  if (msg.data > 0) {
+    motors.right_motor_forward(msg);
+  } else if (msg.data < 0) {
+    std_msgs::Float32 temp;
+    temp.data = abs(msg.data);
+    motors.right_motor_reverse(temp);
+  } else {
+    motors.right_motor_brake();
+  }
+}
+
+void lwheel_vtarget_callback(const std_msgs::Float32& msg) {
+  l_pid.pid_target = msg.data;
+  l_pid.calc_velocity();
+  l_pid.do_pid();
+  l_pid.pid_spin();
+}
+
+void rwheel_vtarget_callback(const std_msgs::Float32& msg) {
+  r_pid.pid_target = msg.data;
+  r_pid.calc_velocity();
+  r_pid.do_pid();
+  r_pid.pid_spin();
+}
+
+
+void encoder_reset_callback(const std_msgs::Empty& reset_msg) {
   lenc_val = 0;
   renc_val = 0;
   lmotor_encoder.write(0);
