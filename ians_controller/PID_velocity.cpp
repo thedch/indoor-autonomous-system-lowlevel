@@ -6,7 +6,7 @@ PID_velocity::PID_velocity() {
     pid_error = 0;
     pid_target = 0;
     pid_motor = 0;
-    pid_vel = 0;
+    vel = 0;
     pid_intergral = 0;
     pid_derivative = 0;
     pid_previous_error = 0;
@@ -32,7 +32,7 @@ PID_velocity::PID_velocity() {
     encoder_high_wrap = (encoder_max - encoder_min) * 0.7 + encoder_min; // 22k
     wheel_latest = 0.0;
     rolling_pts = 2;
-    myArray[ROLLING_PTS] = { 0 }; // all elements 0
+    prev_vel[ROLLING_PTS] = { 0 }; // all elements 0
 }
 
 void PID_velocity::calc_velocity() {
@@ -47,7 +47,8 @@ void PID_velocity::calc_velocity() {
             append_vel(0);
             calc_rolling_vel();
         } else { // moving
-            if ((pid_vel >= 0 && pid_vel > cur_vel && cur_vel >= 0) || (pid_vel < 0 && pid_vel < cur_vel && cur_vel <= 0)) {
+            if ((vel >= 0 && vel > cur_vel && cur_vel >= 0) ||
+                    (vel < 0 && vel < cur_vel && cur_vel <= 0)) {
                 append_vel(cur_vel);
                 calc_rolling_vel();
             }
@@ -78,7 +79,7 @@ void PID_velocity::calc_rolling_vel() {
     for (int i = 0; i < ROLLING_PTS; i++) {
         sum += prev_vel[i];
     }
-    return sum;
+    vel = sum / ROLLING_PTS;
 }
 
 void PID_velocity::do_pid() {
@@ -86,7 +87,7 @@ void PID_velocity::do_pid() {
     float pid_dt = pid_dt_duration / 1000;
     prev_pid_time = millis();
 
-    pid_error = pid_target - pid_vel;
+    pid_error = pid_target - vel;
     pid_intergral = pid_intergral + (pid_error * pid_dt); // might need to be pid_dt
     pid_derivative = (pid_error - pid_previous_error) / pid_dt; // migt need to be pid_dt
     pid_previous_error = pid_error;

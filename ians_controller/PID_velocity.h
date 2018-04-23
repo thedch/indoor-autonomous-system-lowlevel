@@ -20,7 +20,7 @@ class PID_velocity
     private:
         float pid_error;
         float pid_motor;
-        float pid_vel;
+        float vel;
         float pid_intergral;
         float pid_derivative;
         float pid_previous_error;
