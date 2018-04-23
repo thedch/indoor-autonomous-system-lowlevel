@@ -46,7 +46,7 @@ class PID_velocity
         int encoder_low_wrap;
         int encoder_high_wrap;
         int rolling_pts;
-        float myArray[ROLLING_PTS]; // all elements 0
+        float prev_vel[ROLLING_PTS];
 
     public:
         PID_velocity();

@@ -2,7 +2,7 @@
 #include "PID_velocity.h"
 
 PID_velocity::PID_velocity() {
-//  Serial.begin(9600);
+    // Serial.begin(9600);
     pid_error = 0;
     pid_target = 0;
     pid_motor = 0;
@@ -64,19 +64,21 @@ void PID_velocity::calc_velocity() {
 
 }
 
-void PID_velocity::append_vel(double val) { // Add velocity to history
-//pid_prev_vel->push(val);
+// The prev_vel array is modeled as a FILO queue: elements are added at
+// index 0, and fall off the array at index ROLLING_PTS
+void PID_velocity::append_vel(double val) {
+    for (int i = 1; i < ROLLING_PTS; i++) {
+        prev_vel[i] = prev_vel[i - 1];
+    }
+    prev_vel[0] = val;
 }
 
 void PID_velocity::calc_rolling_vel() {
-    //pid_vel = pid_prev_vel->mean();
-    pid_vel = 10;
-    //pid_vel = pid_prev_vel->mean();
-    // int sum = 0;
-    // for (int i = 0; i < pid_prev_vel.size(); i++) {
-    //   sum += pid_prev_vel[i];
-    // }
-    // return float(sum/pid_prev_vel.size());
+    int sum = 0;
+    for (int i = 0; i < ROLLING_PTS; i++) {
+        sum += prev_vel[i];
+    }
+    return sum;
 }
 
 void PID_velocity::do_pid() {
@@ -102,7 +104,7 @@ void PID_velocity::do_pid() {
     }
 }
 
-void PID_velocity::wheelCallback(int enc) {
+void PID_velocity::wheelCallback(int enc) { // TODO: This is not a callback, it's just a function. Rename this.
     if (enc < encoder_low_wrap && prev_encoder > encoder_high_wrap) {
         wheel_mult++;
     }
@@ -115,7 +117,7 @@ void PID_velocity::wheelCallback(int enc) {
 }
 
 void PID_velocity::targetCallback(std_msgs::Float32 msg) {
-    // When we recieve a geo twist, this happens
+    // When we receive a geom twist, this happens
     pid_target = msg.data;
     ticks_since_target = 0;
     calc_velocity();

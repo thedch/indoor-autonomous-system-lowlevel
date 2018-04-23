@@ -26,7 +26,7 @@ Encoder lmotor_encoder(LEFT_ENCODER_PIN1, LEFT_ENCODER_PIN2);
 Encoder rmotor_encoder(RIGHT_ENCODER_PIN1, RIGHT_ENCODER_PIN2);
 PID_velocity l_pid;
 PID_velocity r_pid;
-int16_t lenc_val = 0;
+int16_t lenc_val = 0; // TODO: What is this for?
 int16_t renc_val = 0;
 
 // ROS FUNCTIONS & VARIABLES
@@ -71,14 +71,16 @@ void loop() {
 }
 
 void ROS_encoder_publisher() {
+  // Send the odom to the Pi for the nav stack
   lwheel_msg.data = (lmotor_encoder.read() / 4);
   rwheel_msg.data = (rmotor_encoder.read() / 4);
   lwheel.publish(&lwheel_msg);
   rwheel.publish(&rwheel_msg);
+  // Update the PID controller with the current odom
   l_pid.wheelCallback(lwheel_msg.data);
   r_pid.wheelCallback(rwheel_msg.data);
 
-  delay(100);
+  delay(100); // TODO: What is this?
 }
 
 void lmotor_callback(const std_msgs::Float32& msg) {
@@ -92,7 +94,6 @@ void lmotor_callback(const std_msgs::Float32& msg) {
     motors.left_motor_brake();
   }
 }
-
 
 void rmotor_callback(const std_msgs::Float32& msg) {
   if (msg.data > 0) {
@@ -117,6 +118,7 @@ void rwheel_vtarget_callback(const std_msgs::Float32& msg) {
   r_pid.pid_target = msg.data;
   r_pid.calc_velocity();
   r_pid.do_pid();
+  // TODO: pid_spin calls do_pid, why are we calling both?
   r_pid.pid_spin();
 }
 
