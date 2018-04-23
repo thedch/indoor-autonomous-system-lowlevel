@@ -21,7 +21,7 @@ class PID_velocity
         float pid_error;
         float pid_motor;
         float vel;
-        float pid_intergral;
+        float pid_integral;
         float pid_derivative;
         float pid_previous_error;
         float wheel_prev; // previous encoder total ticks

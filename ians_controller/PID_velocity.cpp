@@ -7,7 +7,7 @@ PID_velocity::PID_velocity() {
     pid_target = 0;
     pid_motor = 0;
     vel = 0;
-    pid_intergral = 0;
+    pid_integral = 0;
     pid_derivative = 0;
     pid_previous_error = 0;
     wheel_prev = 0;
@@ -52,9 +52,7 @@ void PID_velocity::calc_velocity() {
                 append_vel(cur_vel);
                 calc_rolling_vel();
             }
-
         }
-
     } else {
         cur_vel = (wheel_latest - wheel_prev) / dt;
         append_vel(cur_vel);
@@ -62,7 +60,6 @@ void PID_velocity::calc_velocity() {
         wheel_prev = wheel_latest;
         then = millis();
     }
-
 }
 
 // The prev_vel array is modeled as a FILO queue: elements are added at
@@ -88,18 +85,18 @@ void PID_velocity::do_pid() {
     prev_pid_time = millis();
 
     pid_error = pid_target - vel;
-    pid_intergral = pid_intergral + (pid_error * pid_dt); // might need to be pid_dt
+    pid_integral = pid_integral + (pid_error * pid_dt); // might need to be pid_dt
     pid_derivative = (pid_error - pid_previous_error) / pid_dt; // migt need to be pid_dt
     pid_previous_error = pid_error;
 
-    pid_motor = (pid_Kp * pid_error) + (pid_Ki * pid_intergral) + (pid_Kd * pid_derivative);
+    pid_motor = (pid_Kp * pid_error) + (pid_Ki * pid_integral) + (pid_Kd * pid_derivative);
 
     if (pid_motor > out_max) {
         pid_motor = out_max;
-        pid_intergral = pid_intergral - (pid_error * pid_dt); //might need to be pid_dt
+        pid_integral = pid_integral - (pid_error * pid_dt); //might need to be pid_dt
     } else if (pid_motor < out_min) {
         pid_motor = out_min;
-        pid_intergral = pid_intergral - (pid_error * pid_dt); //might need to be pid_dt
+        pid_integral = pid_integral - (pid_error * pid_dt); //might need to be pid_dt
     } else if (pid_target == 0) {
         pid_motor = 0;
     }
@@ -130,7 +127,7 @@ void PID_velocity::pid_spin() {
     ticks_since_target = timeout_ticks;
     wheel_prev = wheel_latest;
 
-    pid_previous_error = pid_intergral = pid_error = pid_derivative = 0;
+    pid_previous_error = pid_integral = pid_error = pid_derivative = 0;
 
     std_msgs::Float32 motor_msg;
     while (ticks_since_target < timeout_ticks) {
