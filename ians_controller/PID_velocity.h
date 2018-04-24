@@ -12,12 +12,14 @@
 #include <std_msgs/Float32.h>
 #include <std_msgs/Int16.h>
 #include "Arduino.h"
+//#include "Motors.h"
 
 #define ROLLING_PTS 5
 
 class PID_velocity
 {
     private:
+//        Motors motor;
         float pid_error;
         float pid_motor;
         float vel;
@@ -50,14 +52,15 @@ class PID_velocity
 
     public:
         PID_velocity();
+        //PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2);
         void calc_velocity();
         void append_vel(double val);
         void calc_rolling_vel();
         void do_pid();
-        void wheelCallback(int enc);
-        void targetCallback(std_msgs::Float32 msg);
+        void cumulative_enc_val(int enc);
+//        void process_vel_target(std_msgs::Float32 msg);
         int pid_target;
-        void pid_spin();
+        void pid_spin(std_msgs::Float32 target_msg);
 };
 
 #endif

@@ -77,13 +77,18 @@ class Motors
     int lm_dir2;   
   
   public:
-    Motors(int right_pwm_Pin, int rmotor_direction_pin1, int rmotor_direction_pin2, int left_pwm_pin, int lmotor_direction_pin1, int lmotor_direction_pin2);
-    void right_motor_forward(std_msgs::Float32 motor_speed);
-    void right_motor_reverse(std_msgs::Float32 motor_speed);
-    void left_motor_forward(std_msgs::Float32 motor_speed);
-    void left_motor_reverse(std_msgs::Float32 motor_speed);
+//    Motors(int right_pwm_Pin, int rmotor_direction_pin1, int rmotor_direction_pin2, int left_pwm_pin, int lmotor_direction_pin1, int lmotor_direction_pin2);
+    Motors(int right_pwm_Pin, int rmotor_direction_pin1, int rmotor_direction_pin2);
+    void motor_cmd(std_msgs::Float32 motor_speed);
+    void left_motor_forward(float motor_speed);
+    void left_motor_reverse(float motor_speed);
     void left_motor_brake();
-    void right_motor_brake();       
+//    void right_motor_forward(std_msgs::Float32 motor_speed);
+//    void right_motor_reverse(std_msgs::Float32 motor_speed);
+//    void right_motor_brake();
+//    void left_motor_forward(std_msgs::Float32 motor_speed);
+//    void left_motor_reverse(std_msgs::Float32 motor_speed);
+//    void left_motor_brake();
 };
 
 #endif

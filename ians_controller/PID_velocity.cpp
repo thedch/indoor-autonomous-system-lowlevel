@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include "PID_velocity.h"
 
+//PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2) : motor(PWM_PIN, MOTOR_EN1, MOTOR_EN2){
 PID_velocity::PID_velocity() {
     // Serial.begin(9600);
     pid_error = 0;
@@ -60,6 +61,7 @@ void PID_velocity::calc_velocity() {
         wheel_prev = wheel_latest;
         then = millis();
     }
+    // might need to publish vel
 }
 
 // The prev_vel array is modeled as a FILO queue: elements are added at
@@ -102,7 +104,7 @@ void PID_velocity::do_pid() {
     }
 }
 
-void PID_velocity::wheelCallback(int enc) { // TODO: This is not a callback, it's just a function. Rename this.
+void PID_velocity::cumulative_enc_val(int enc) {
     if (enc < encoder_low_wrap && prev_encoder > encoder_high_wrap) {
         wheel_mult++;
     }
@@ -114,33 +116,35 @@ void PID_velocity::wheelCallback(int enc) { // TODO: This is not a callback, it'
     prev_encoder = enc;
 }
 
-void PID_velocity::targetCallback(std_msgs::Float32 msg) {
-    // When we receive a geom twist, this happens
-    pid_target = msg.data;
-    ticks_since_target = 0;
-    calc_velocity();
-    do_pid();
-}
+// void PID_velocity::process_vel_target(std_msgs::Float32 msg) {
+//     // When we receive a geom twist, this happens
+//     pid_target = msg.data;
+//     ticks_since_target = 0;
+//     calc_velocity();
+//     do_pid();
+// }
 
-void PID_velocity::pid_spin() {
+void PID_velocity::pid_spin(std_msgs::Float32 target_msg) {
+    pid_target = target_msg.data;
     then = millis();
-    ticks_since_target = timeout_ticks;
+    pid_target = target_msg.data;
+    ticks_since_target = 0;
+    // ticks_since_target = timeout_ticks;
     wheel_prev = wheel_latest;
 
     pid_previous_error = pid_integral = pid_error = pid_derivative = 0;
 
     std_msgs::Float32 motor_msg;
-    // TODO: ticks_since_target = timeout_ticks, so this loop will never enter?
     while (ticks_since_target < timeout_ticks) {
         calc_velocity();
         do_pid();
         motor_msg.data = pid_motor;
-        //publish motors
-
+        //call motor command motors
+        //motor.motor_cmd(motor_msg);
         ticks_since_target += 1;
         if (ticks_since_target == timeout_ticks) {
             motor_msg.data = 0;
-            //publish motors
+            //motor.motor_cmd(motor_msg);
         }
     }
 }
