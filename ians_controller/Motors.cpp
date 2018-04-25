@@ -6,66 +6,76 @@
 #include "Arduino.h"
 #include "Motors.h"
 
-//Motors::Motors(int right_pwm_pin, int rmotor_direction_pin1, int rmotor_direction_pin2, int left_pwm_pin, int lmotor_direction_pin1, int lmotor_direction_pin2){
-Motors::Motors(int left_pwm_pin, int lmotor_direction_pin1, int lmotor_direction_pin2){
-//  pinMode(right_pwm_pin, OUTPUT); //right motor PWM pin
-//  pinMode(rmotor_direction_pin1, OUTPUT); //right motor direction en1
-//  pinMode(rmotor_direction_pin2, OUTPUT); //right motor direction en2
-  pinMode(left_pwm_pin, OUTPUT); //left motor PWM pin
-  pinMode(lmotor_direction_pin1, OUTPUT); //left motor direction en1
-  pinMode(lmotor_direction_pin2, OUTPUT); //left motor direction en2
-//  r_pwm_pin = right_pwm_pin;
-//  rm_dir1 = rmotor_direction_pin1;
-//  rm_dir2 = rmotor_direction_pin2;
-  l_pwm_pin = left_pwm_pin;
-  lm_dir1 = lmotor_direction_pin1;
-  lm_dir2 = lmotor_direction_pin2;   
+/*
+| Author: Juan Huerta
+| Param: Digital Pins values on the Teensy used as PWM and 
+|    motor direction and direction enables
+| Remark: This constructor sets the pin numbers given as private
+|    variables of the class
+Motors(int pwm_Pin,int motor_direction_pin1,
+int motor_direction_pin2);
+*/
+
+Motors::Motors(int pwm_pin, int motor_direction_pin1, int motor_direction_pin2){
+  pinMode(pwm_pin, OUTPUT); //motor PWM pin
+  pinMode(motor_direction_pin1, OUTPUT); //motor direction en1
+  pinMode(motor_direction_pin2, OUTPUT); //motor direction en2
+  PWM_pin = pwm_pin;
+  m_dir1 = motor_direction_pin1;
+  m_dir2 = motor_direction_pin2;   
 }
 
+/*
 
-//void Motors::right_motor_forward(std_msgs::Float32 motor_speed){
-//  analogWrite(r_pwm_pin, motor_speed.data);
-//  digitalWrite(rm_dir1, LOW);
-//  digitalWrite(rm_dir2, HIGH);
-//}
-//
-//void Motors::right_motor_reverse(std_msgs::Float32 motor_speed){
-//  analogWrite(r_pwm_pin, motor_speed.data);
-//  digitalWrite(rm_dir1, HIGH);
-//  digitalWrite(rm_dir2, LOW);
-//}
-//
-//void Motors::right_motor_brake(){
-//  analogWrite(r_pwm_pin, 0);
-//  digitalWrite(rm_dir1, LOW);
-//  digitalWrite(rm_dir2, LOW);
-//}
-
+*/
 void Motors::motor_cmd(std_msgs::Float32 motor_speed){
   if(motor_speed.data > 0) {
-    left_motor_forward(motor_speed.data);
+    motor_forward(motor_speed.data);
   }else if (motor_speed.data < 0) {
-//    float temp = abs(motor_speed.data);
-    left_motor_reverse(abs(motor_speed.data));
+    motor_reverse(abs(motor_speed.data));
   }else {
-    left_motor_brake();
+    motor_brake();
   }
 }
 
-void Motors::left_motor_forward(float motor_speed){
-  analogWrite(l_pwm_pin, motor_speed);
-  digitalWrite(lm_dir1, HIGH);
-  digitalWrite(lm_dir2, LOW);
+/*
+| Author: Juan Huerta
+| Param: motor_speed, 0-255
+| Return: Void
+| Remark: This function sets PWM duty cycle of the right
+|    motor and sets directions pins to rotate motors forward
+void Motors::motor_forward(float motor_speed);
+*/
+void Motors::motor_forward(float motor_speed){
+  analogWrite(PWM_pin, motor_speed);
+  digitalWrite(m_dir1, HIGH);
+  digitalWrite(m_dir2, LOW);
 }
 
-void Motors::left_motor_reverse(float motor_speed){
-  analogWrite(l_pwm_pin, motor_speed);
-  digitalWrite(lm_dir1, LOW);
-  digitalWrite(lm_dir2, HIGH);
+/*
+| Author: Juan Huerta
+| Param: motor_speed, 0-255
+| Return: Void
+| Remark: This function sets PWM duty cycle of the right
+|    motor and sets directions pins to rotate motors forward
+void Motors::motor_forward(float motor_speed);
+*/
+void Motors::motor_reverse(float motor_speed){
+  analogWrite(PWM_pin, motor_speed);
+  digitalWrite(m_dir1, LOW);
+  digitalWrite(m_dir2, HIGH);
 }
 
-void Motors::left_motor_brake(){
-  analogWrite(l_pwm_pin, 0);
-  digitalWrite(lm_dir1, LOW);
-  digitalWrite(lm_dir2, LOW);
+/*
+| Author: Juan Huerta
+| Param: None
+| Return: Void
+| Remark: This function sets motor direction pins to zero
+|    and PWM duty cycle to zero to brake the motor
+void Motors::motor_brake();
+*/
+void Motors::motor_brake(){
+  analogWrite(PWM_pin, 0);
+  digitalWrite(m_dir1, LOW);
+  digitalWrite(m_dir2, LOW);
 }

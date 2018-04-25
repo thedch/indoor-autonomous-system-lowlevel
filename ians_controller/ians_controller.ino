@@ -52,8 +52,8 @@ void rwheel_vtarget_callback(const std_msgs::Float32& msg);
 void encoder_reset_callback(const std_msgs::Empty& reset_msg);
 
 // Subscribers to ROS topics
-//ros::Subscriber<std_msgs::Float32> lmotor_sub("lmotor", &lmotor_callback);
-//ros::Subscriber<std_msgs::Float32> rmotor_sub("rmotor", &rmotor_callback);
+ros::Subscriber<std_msgs::Float32> lmotor_sub("lmotor", &lmotor_callback);
+ros::Subscriber<std_msgs::Float32> rmotor_sub("rmotor", &rmotor_callback);
 ros::Subscriber<std_msgs::Float32> lwheel_vtarget_sub("lwheel_vtarget", &lwheel_vtarget_callback);
 ros::Subscriber<std_msgs::Float32> rwheel_vtarget_sub("rwheel_vtarget", &rwheel_vtarget_callback);
 ros::Subscriber<std_msgs::Empty> reset_encoder_sub("reset_encoders", &encoder_reset_callback);
@@ -64,8 +64,8 @@ void setup() {
   nh.initNode();
   nh.advertise(lwheel);
   nh.advertise(rwheel);
-//  nh.subscribe(lmotor_sub);
-//  nh.subscribe(rmotor_sub);
+  nh.subscribe(lmotor_sub);
+  nh.subscribe(rmotor_sub);
   nh.subscribe(lwheel_vtarget_sub);
   nh.subscribe(rwheel_vtarget_sub);
   nh.subscribe(reset_encoder_sub);
