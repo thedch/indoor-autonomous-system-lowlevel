@@ -25,7 +25,6 @@
 #define BAUD_RATE 9600
 
 // MOTOR FUNCTIONS & VARIABLES
-//Motors motors(RIGHT_PWM_PIN, RIGHT_MOTOR_EN1, RIGHT_MOTOR_EN2, LEFT_PWM_PIN, LEFT_MOTOR_EN1, LEFT_MOTOR_EN2);
 Motors right_motor(RIGHT_PWM_PIN, RIGHT_MOTOR_EN1, RIGHT_MOTOR_EN2);
 Motors left_motor(LEFT_PWM_PIN, LEFT_MOTOR_EN1, LEFT_MOTOR_EN2);
 Encoder lmotor_encoder(LEFT_ENCODER_PIN1, LEFT_ENCODER_PIN2);
@@ -34,6 +33,7 @@ Encoder rmotor_encoder(RIGHT_ENCODER_PIN1, RIGHT_ENCODER_PIN2);
 //PID_velocity r_pid(RIGHT_PWM_PIN, RIGHT_MOTOR_EN1, RIGHT_MOTOR_EN2);
 PID_velocity l_pid;
 PID_velocity r_pid;
+IntervalTimer encoder_timer; //interrupt to publish encoder values at 10hz
 int16_t lenc_val = 0; // initialize encoder values
 int16_t renc_val = 0;
 
@@ -60,6 +60,8 @@ ros::Subscriber<std_msgs::Empty> reset_encoder_sub("reset_encoders", &encoder_re
 
 void setup() {
   Serial.begin(BAUD_RATE);
+  //Encoder Interrupt set up
+  encoder_timer.begin(ROS_encoder_publisher,100000);
   // ROS Node Setup
   nh.initNode();
   nh.advertise(lwheel);
@@ -73,7 +75,6 @@ void setup() {
 
 // Main Loop
 void loop() {
-  ROS_encoder_publisher();
   // Sit and spin and wait for message publications from the Pi
   nh.spinOnce();
 }
@@ -87,8 +88,6 @@ void ROS_encoder_publisher() {
   // Update the PID controller with the current odom
   l_pid.cumulative_enc_val(lwheel_msg.data);
   r_pid.cumulative_enc_val(rwheel_msg.data);
-
-  delay(100); // Publishes encoders at a rate of 10HZ
 }
 
 void lmotor_callback(const std_msgs::Float32& msg) {
