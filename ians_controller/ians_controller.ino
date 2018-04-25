@@ -11,11 +11,7 @@
 #define LEFT_PWM_PIN 2
 #define LEFT_MOTOR_EN1 24
 #define LEFT_MOTOR_EN2 25
-//#define LEFT_MOTOR_EN1 25
-//#define LEFT_MOTOR_EN2 24
 #define RIGHT_PWM_PIN 23
-//#define RIGHT_MOTOR_EN1 22
-//#define RIGHT_MOTOR_EN2 21
 #define RIGHT_MOTOR_EN1 21
 #define RIGHT_MOTOR_EN2 22
 #define LEFT_ENCODER_PIN1 32
@@ -24,15 +20,17 @@
 #define RIGHT_ENCODER_PIN2 31
 #define BAUD_RATE 9600
 
+//PID Constants
+#define KD 0.01
+#define KP 400
+#define KI 100
+#define TIMEOUT_TICKS 40
+
 // MOTOR FUNCTIONS & VARIABLES
-Motors right_motor(RIGHT_PWM_PIN, RIGHT_MOTOR_EN1, RIGHT_MOTOR_EN2);
-Motors left_motor(LEFT_PWM_PIN, LEFT_MOTOR_EN1, LEFT_MOTOR_EN2);
 Encoder lmotor_encoder(LEFT_ENCODER_PIN1, LEFT_ENCODER_PIN2);
 Encoder rmotor_encoder(RIGHT_ENCODER_PIN1, RIGHT_ENCODER_PIN2);
-//PID_velocity l_pid(LEFT_PWM_PIN, LEFT_MOTOR_EN1, LEFT_MOTOR_EN2);  //PID controller that creates own motor object
-//PID_velocity r_pid(RIGHT_PWM_PIN, RIGHT_MOTOR_EN1, RIGHT_MOTOR_EN2);
-PID_velocity l_pid;
-PID_velocity r_pid;
+PID_velocity l_pid(LEFT_PWM_PIN, LEFT_MOTOR_EN1, LEFT_MOTOR_EN2, KD, KP, KI, TIMEOUT_TICKS);  //PID controller that creates own motor object
+PID_velocity r_pid(RIGHT_PWM_PIN, RIGHT_MOTOR_EN1, RIGHT_MOTOR_EN2, KD, KP, KI, TIMEOUT_TICKS);
 IntervalTimer encoder_timer; //interrupt to publish encoder values at 10hz
 int16_t lenc_val = 0; // initialize encoder values
 int16_t renc_val = 0;
@@ -91,11 +89,11 @@ void ROS_encoder_publisher() {
 }
 
 void lmotor_callback(const std_msgs::Float32& msg) {
-  left_motor.motor_cmd(msg);
+  l_pid.test_motor_control(msg);
 }
 
 void rmotor_callback(const std_msgs::Float32& msg) {
-  right_motor.motor_cmd(msg);
+  r_pid.test_motor_control(msg);
 }
 
 void lwheel_vtarget_callback(const std_msgs::Float32& msg) {

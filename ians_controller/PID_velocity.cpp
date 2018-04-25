@@ -1,9 +1,8 @@
 #include "Arduino.h"
 #include "PID_velocity.h"
 
-//PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2) : motor(PWM_PIN, MOTOR_EN1, MOTOR_EN2){
-PID_velocity::PID_velocity() {
-    // Serial.begin(9600);
+PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,float Kp,float Ki,int timeout_tick) : motor(PWM_PIN, MOTOR_EN1, MOTOR_EN2){
+    pinMode(13, OUTPUT);
     pid_error = 0;
     pid_target = 0;
     pid_motor = 0;
@@ -18,21 +17,21 @@ PID_velocity::PID_velocity() {
 
     then = millis();
     prev_pid_time = millis();
-    pid_Kp = 10.0f;
-    pid_Ki = 10.0f;
-    pid_Kd = 0.001f;
+    pid_Kp = Kp;
+    pid_Ki = Ki;
+    pid_Kd = Kd;
     out_min = -255;
     out_max = 255;
     rate = 30;
-    timeout_ticks = 4;
-    ticks_per_meter = 20;
+    timeout_ticks = timeout_tick;
+    ticks_per_meter = 1527.88;
     velocity_threshold = 0.001;
     encoder_min = -32768;
     encoder_max = 32768;
     encoder_low_wrap = (encoder_max - encoder_min) * 0.3 + encoder_min; // 10k
     encoder_high_wrap = (encoder_max - encoder_min) * 0.7 + encoder_min; // 22k
     wheel_latest = 0.0;
-    rolling_pts = 2;
+    rolling_pts = 5;
     prev_vel[ROLLING_PTS] = { 0 }; // all elements 0
 }
 
@@ -83,7 +82,7 @@ void PID_velocity::calc_rolling_vel() {
 
 void PID_velocity::do_pid() {
     unsigned long pid_dt_duration = millis() - prev_pid_time;
-    float pid_dt = pid_dt_duration / 1000;
+    double pid_dt = pid_dt_duration / 1000;
     prev_pid_time = millis();
 
     pid_error = pid_target - vel;
@@ -99,8 +98,14 @@ void PID_velocity::do_pid() {
     } else if (pid_motor < out_min) {
         pid_motor = out_min;
         pid_integral = pid_integral - (pid_error * pid_dt); //might need to be pid_dt
-    } else if (pid_target == 0) {
-        pid_motor = 0;
+    } 
+
+    if(pid_target > 0){ //prevents neg output for pos target
+      pid_motor = std::max(0.0,pid_motor);
+    }else if(pid_target < 0){ // prevents pos output for neg target
+      pid_motor = std::min(pid_motor, 0.0);
+    }else if (pid_target == 0) {
+      pid_motor = 0;
     }
 }
 
@@ -125,7 +130,6 @@ void PID_velocity::cumulative_enc_val(int enc) {
 // }
 
 void PID_velocity::pid_spin(std_msgs::Float32 target_msg) {
-    pid_target = target_msg.data;
     then = millis();
     pid_target = target_msg.data;
     ticks_since_target = 0;
@@ -135,17 +139,23 @@ void PID_velocity::pid_spin(std_msgs::Float32 target_msg) {
     pid_previous_error = pid_integral = pid_error = pid_derivative = 0;
 
     std_msgs::Float32 motor_msg;
-    while (ticks_since_target < timeout_ticks) {
+//    while (ticks_since_target < timeout_ticks) {
+        digitalWrite(13,HIGH);
         calc_velocity();
         do_pid();
         motor_msg.data = pid_motor;
+        Serial.println(motor_msg.data);
         //call motor command motors
-        //motor.motor_cmd(motor_msg);
+        motor.motor_cmd(motor_msg);
         ticks_since_target += 1;
-        if (ticks_since_target == timeout_ticks) {
-            motor_msg.data = 0;
-            //motor.motor_cmd(motor_msg);
-        }
-    }
+//        if (ticks_since_target == timeout_ticks) {
+//            motor_msg.data = 0;
+//            motor.motor_cmd(motor_msg);
+//        }
+//    }
+}
+
+void PID_velocity::test_motor_control(std_msgs::Float32 msg){
+  motor.motor_cmd(msg);
 }
 
