@@ -69,8 +69,8 @@ ros::Subscriber<std_msgs::Float32> lwheel_vtarget_sub("lwheel_vtarget", &lwheel_
 ros::Subscriber<std_msgs::Float32> rwheel_vtarget_sub("rwheel_vtarget", &rwheel_vtarget_callback);
 ros::Subscriber<std_msgs::Empty> reset_encoder_sub("reset_encoders", &encoder_reset_callback);
 
-std_msgs::Float32 l_wheel_target;
-std_msgs::Float32 r_wheel_target;
+float l_wheel_target; // TODO: do these need to be declared static?
+float r_wheel_target;
 
 void setup() {
   Serial.begin(BAUD_RATE);
@@ -98,8 +98,8 @@ void loop() {
 }
 
 void run_PID() {  
-  r_wheel_target.data = 0.3;
-  l_wheel_target.data = 0.3; // TODO: These should get set in a callback, not hardcoded
+  r_wheel_target = 0.3;
+  l_wheel_target = 0.3; // TODO: These should get set in a callback, not hardcoded
   r_pid.pid_spin(r_wheel_target);
   l_pid.pid_spin(l_wheel_target);
 }
@@ -129,12 +129,11 @@ void rmotor_callback(const std_msgs::Float32& msg) {
 }
 
 void lwheel_vtarget_callback(const std_msgs::Float32& msg) {
-  l_pid.pid_spin(msg);
-  // TODO: Update a global command variable here, and let the interrupt call the PID loop that references the command variable 
+  l_wheel_target = msg.data;
 }
 
 void rwheel_vtarget_callback(const std_msgs::Float32& msg) {
-  r_pid.pid_spin(msg);
+  r_wheel_target = msg.data;
 }
 
 void encoder_reset_callback(const std_msgs::Empty& reset_msg) {

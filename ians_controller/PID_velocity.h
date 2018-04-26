@@ -35,13 +35,11 @@ class PID_velocity
         float pid_Kd;
         int out_min;
         int out_max;
-        int rate;
-        int timeout_ticks;
+        int rate;        
         int ticks_per_meter;
         double velocity_threshold;
         int encoder_min;
-        int encoder_max;
-        int ticks_since_target;
+        int encoder_max;        
         unsigned long prev_pid_time;
         unsigned long then; // This is in milliseconds
         // float dt; // This is in seconds
@@ -60,7 +58,7 @@ class PID_velocity
 //        void process_vel_target(std_msgs::Float32 msg);
         void test_motor_control(std_msgs::Float32 msg);
         float pid_target;
-        void pid_spin(std_msgs::Float32 target_msg);
+        void pid_spin(float v_target);
 };
 
 #endif

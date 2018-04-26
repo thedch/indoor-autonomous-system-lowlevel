@@ -21,8 +21,7 @@ PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,floa
     pid_Kd = Kd;
     out_min = -255;
     out_max = 255;
-    rate = 30;
-    timeout_ticks = timeout_tick; // TODO: Delete this
+    rate = 30;    
     ticks_per_meter = 1527.88; // TODO: This should not be hardcoded, but passed in 
     velocity_threshold = 0.001;
     encoder_min = -32768;
@@ -140,35 +139,13 @@ void PID_velocity::cumulative_enc_val(int enc) {
     prev_encoder = enc;
 }
 
-void PID_velocity::pid_spin(std_msgs::Float32 target_msg) { // TODO: Take a float instead of a msg, unpack the message higher up the stack
-  if (ticks_since_target > timeout_ticks) { // This will never happen! Delete this
-    then = millis();
-    Serial.println("Just reset the 'then' variable!");
-    
-    ticks_since_target = 0;
-    // ticks_since_target = timeout_ticks;
-    wheel_prev = wheel_latest;
-
-    pid_previous_error = pid_integral = pid_error = pid_derivative = 0;
-  }
-    
-
-    std_msgs::Float32 motor_msg; // TODO: Put this in a class variable
-    pid_target = target_msg.data;
-      
+void PID_velocity::pid_spin(float v_target) {    
+    pid_target = v_target;
     calc_velocity();
     do_pid();
+    std_msgs::Float32 motor_msg; // TODO: This should be an int, correct? Also, no need for ROS msg, just send in raw data
     motor_msg.data = pid_motor;
     motor.motor_cmd(motor_msg);
-//      ticks_since_target += 1;
-      
-//      Serial.print("Current signal to motor ");
-//      Serial.println(motor_msg.data);
-      
-//      if (ticks_since_target == timeout_ticks) {
-//          motor_msg.data = 0;
-//          motor.motor_cmd(motor_msg);
-//      }    
 }
 
 void PID_velocity::test_motor_control(std_msgs::Float32 msg){

@@ -29,7 +29,7 @@ Motors::Motors(int pwm_pin, int motor_direction_pin1, int motor_direction_pin2){
 
 */
 void Motors::motor_cmd(std_msgs::Float32 motor_speed){
-  if(motor_speed.data > 0) {
+  if(motor_speed.data > 0) { // TODO: No need for a ROS msg here, just take a float
     motor_forward(motor_speed.data);
   }else if (motor_speed.data < 0) {
     motor_reverse(abs(motor_speed.data));
