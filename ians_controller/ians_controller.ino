@@ -1,5 +1,6 @@
 #include "Motors.h"
 #include "PID_velocity.h"
+#include "IMU.h"
 #include <ros.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/Float32.h>
@@ -35,12 +36,19 @@ IntervalTimer encoder_timer; //interrupt to publish encoder values at 10hz
 int16_t lenc_val = 0; // initialize encoder values
 int16_t renc_val = 0;
 
+//IMU
+//IMU robot_imu;
+
 // ROS FUNCTIONS & VARIABLES
 ros::NodeHandle nh;
 std_msgs::Int16 lwheel_msg, rwheel_msg;
+sensor_msgs::Imu IMU_msg;
+sensor_msgs::MagneticField MF_msg;
 ros::Publisher lwheel("lwheel", &lwheel_msg);
 ros::Publisher rwheel("rwheel", &rwheel_msg);
-void ROS_encoder_publisher();
+ros::Publisher imu_data("imu_data", &IMU_msg);
+ros::Publisher compass("compass", &MF_msg);
+void ROS_publisher();
 
 // Callback headers to be used when a ROS topic publish is received
 void lmotor_callback(const std_msgs::Float32& msg);
@@ -59,11 +67,13 @@ ros::Subscriber<std_msgs::Empty> reset_encoder_sub("reset_encoders", &encoder_re
 void setup() {
   Serial.begin(BAUD_RATE);
   //Encoder Interrupt set up
-  encoder_timer.begin(ROS_encoder_publisher,100000);
+  encoder_timer.begin(ROS_publisher,100000);
   // ROS Node Setup
   nh.initNode();
   nh.advertise(lwheel);
   nh.advertise(rwheel);
+//  nh.advertise(imu_data);
+//  nh.advertise(compass);
   nh.subscribe(lmotor_sub);
   nh.subscribe(rmotor_sub);
   nh.subscribe(lwheel_vtarget_sub);
@@ -77,12 +87,17 @@ void loop() {
   nh.spinOnce();
 }
 
-void ROS_encoder_publisher() {
+void ROS_publisher() {
   // Send the odom to the Pi for the nav stack
   lwheel_msg.data = (lmotor_encoder.read() / 4);
   rwheel_msg.data = (rmotor_encoder.read() / 4);
   lwheel.publish(&lwheel_msg);
   rwheel.publish(&rwheel_msg);
+  //Publish IMU data
+  //IMU_msg = robot_imu.read_IMUmsg_data();
+  //imu_data.publish(&IMU_msg);
+  //MF_msg = robot_imu.read_compass();
+  //compass.publish(&MF_msg);
   // Update the PID controller with the current odom
   l_pid.cumulative_enc_val(lwheel_msg.data);
   r_pid.cumulative_enc_val(rwheel_msg.data);

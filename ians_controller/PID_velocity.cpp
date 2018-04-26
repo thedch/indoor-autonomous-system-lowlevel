@@ -42,7 +42,7 @@ void PID_velocity::calc_velocity() {
     double cur_vel;
 
     if (wheel_latest == wheel_prev) {
-        cur_vel = 1.0 / (double)ticks_per_meter / dt;
+        cur_vel = (1.0 / (double)ticks_per_meter) / dt;
         if (abs(cur_vel) < velocity_threshold) { // too slow
             append_vel(0);
             calc_rolling_vel();
@@ -86,18 +86,18 @@ void PID_velocity::do_pid() {
     prev_pid_time = millis();
 
     pid_error = pid_target - vel;
-    pid_integral = pid_integral + (pid_error * pid_dt); // might need to be pid_dt
-    pid_derivative = (pid_error - pid_previous_error) / pid_dt; // migt need to be pid_dt
+    pid_integral = pid_integral + (pid_error * pid_dt); 
+    pid_derivative = (pid_error - pid_previous_error) / pid_dt; 
     pid_previous_error = pid_error;
 
     pid_motor = (pid_Kp * pid_error) + (pid_Ki * pid_integral) + (pid_Kd * pid_derivative);
 
     if (pid_motor > out_max) {
         pid_motor = out_max;
-        pid_integral = pid_integral - (pid_error * pid_dt); //might need to be pid_dt
+        pid_integral = pid_integral - (pid_error * pid_dt); 
     } else if (pid_motor < out_min) {
         pid_motor = out_min;
-        pid_integral = pid_integral - (pid_error * pid_dt); //might need to be pid_dt
+        pid_integral = pid_integral - (pid_error * pid_dt); 
     } 
 
     if(pid_target > 0){ //prevents neg output for pos target

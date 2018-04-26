@@ -4,6 +4,8 @@
 #include "Arduino.h"
 #include <ros.h>
 #include <sensor_msgs/Imu.h>
+#include <sensor_msgs/MagneticField.h>
+
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
@@ -17,7 +19,8 @@ class IMU
     
   public:
     IMU();
-    sensor_msgs::Imu read_data();
+    sensor_msgs::Imu read_IMUmsg_data();
+    sensor_msgs::MagneticField read_compass();
 };
 
 #endif
