@@ -49,7 +49,7 @@ class PID_velocity
         int encoder_low_wrap;
         int encoder_high_wrap;
         int rolling_pts;
-        float prev_vel[ROLLING_PTS] = { 0 };
+        float prev_vel[ROLLING_PTS] = { 0 };        
 
     public: 
         PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,float Kp,float Ki,int timeout_tick);
@@ -60,7 +60,7 @@ class PID_velocity
         void cumulative_enc_val(int enc);
 //        void process_vel_target(std_msgs::Float32 msg);
         void test_motor_control(std_msgs::Float32 msg);
-        int pid_target;
+        float pid_target;
         void pid_spin(std_msgs::Float32 target_msg);
 };
 
