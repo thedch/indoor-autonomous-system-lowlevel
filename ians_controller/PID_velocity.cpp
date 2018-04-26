@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "PID_velocity.h"
 
-PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,float Kp,float Ki,int timeout_tick) : motor(PWM_PIN, MOTOR_EN1, MOTOR_EN2){
+PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,float Kp,float Ki,float ticks_per_m) : motor(PWM_PIN, MOTOR_EN1, MOTOR_EN2){
     pinMode(13, OUTPUT); // TODO: Is this needed?
     pid_error = 0;
     pid_target = 0;
@@ -21,8 +21,8 @@ PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,floa
     pid_Kd = Kd;
     out_min = -255;
     out_max = 255;
-    rate = 30;    
-    ticks_per_meter = 1527.88; // TODO: This should not be hardcoded, but passed in 
+    rate = 30;
+    ticks_per_meter = ticks_per_m;
     velocity_threshold = 0.001;
     encoder_min = -32768;
     encoder_max = 32768;
@@ -139,8 +139,7 @@ void PID_velocity::cumulative_enc_val(int enc) {
     prev_encoder = enc;
 }
 
-void PID_velocity::pid_spin(float v_target) {    
-    pid_target = v_target;
+void PID_velocity::pid_spin() {    
     calc_velocity();
     do_pid();
     std_msgs::Float32 motor_msg; // TODO: This should be an int, correct? Also, no need for ROS msg, just send in raw data

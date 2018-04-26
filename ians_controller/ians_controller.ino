@@ -21,11 +21,13 @@
 #define RIGHT_ENCODER_PIN2 32
 #define BAUD_RATE 9600
 
-//PID Constants
+// PID params
 #define KP 600
 #define KI 200
 #define KD 0
 #define TIMEOUT_TICKS 40
+#define L_TICKS_PER_METER 1527.88
+#define R_TICKS_PER_METER 1527.88
 
 #define ENCODER_RATE 7 // Milliseconds
 #define PID_RATE ENCODER_RATE*2 // Milliseconds
@@ -33,10 +35,14 @@
 // MOTOR FUNCTIONS & VARIABLES
 Encoder lmotor_encoder(LEFT_ENCODER_PIN1, LEFT_ENCODER_PIN2);
 Encoder rmotor_encoder(RIGHT_ENCODER_PIN1, RIGHT_ENCODER_PIN2);
-PID_velocity l_pid(LEFT_PWM_PIN, LEFT_MOTOR_EN1, LEFT_MOTOR_EN2, KD, KP, KI, TIMEOUT_TICKS);  // PID controller that creates own motor object
-PID_velocity r_pid(RIGHT_PWM_PIN, RIGHT_MOTOR_EN1, RIGHT_MOTOR_EN2, KD, KP, KI, TIMEOUT_TICKS);
+
+// PID controller that creates own motor object
+PID_velocity l_pid(LEFT_PWM_PIN, LEFT_MOTOR_EN1, LEFT_MOTOR_EN2, KD, KP, KI, L_TICKS_PER_METER);  
+PID_velocity r_pid(RIGHT_PWM_PIN, RIGHT_MOTOR_EN1, RIGHT_MOTOR_EN2, KD, KP, KI, R_TICKS_PER_METER);
+
 IntervalTimer encoder_timer; // interrupt to publish encoder values at 10hz
 IntervalTimer PID_timer; // interrupt to check PID loop 
+
 int16_t lenc_val = 0; // initialize encoder values
 int16_t renc_val = 0;
 
@@ -69,9 +75,6 @@ ros::Subscriber<std_msgs::Float32> lwheel_vtarget_sub("lwheel_vtarget", &lwheel_
 ros::Subscriber<std_msgs::Float32> rwheel_vtarget_sub("rwheel_vtarget", &rwheel_vtarget_callback);
 ros::Subscriber<std_msgs::Empty> reset_encoder_sub("reset_encoders", &encoder_reset_callback);
 
-float l_wheel_target; // TODO: do these need to be declared static?
-float r_wheel_target;
-
 void setup() {
   Serial.begin(BAUD_RATE);
   // Encoder Interrupt set up
@@ -98,10 +101,11 @@ void loop() {
 }
 
 void run_PID() {  
-  r_wheel_target = 0.3;
-  l_wheel_target = 0.3; // TODO: These should get set in a callback, not hardcoded
-  r_pid.pid_spin(r_wheel_target);
-  l_pid.pid_spin(l_wheel_target);
+  r_pid.pid_target = 0.3;
+  l_pid.pid_target = 0.3; // TODO: Delete this, only set in callback
+  
+  r_pid.pid_spin();
+  l_pid.pid_spin();
 }
 
 void ROS_publisher() {
@@ -129,11 +133,11 @@ void rmotor_callback(const std_msgs::Float32& msg) {
 }
 
 void lwheel_vtarget_callback(const std_msgs::Float32& msg) {
-  l_wheel_target = msg.data;
+  l_pid.pid_target = msg.data;
 }
 
 void rwheel_vtarget_callback(const std_msgs::Float32& msg) {
-  r_wheel_target = msg.data;
+  r_pid.pid_target = msg.data;
 }
 
 void encoder_reset_callback(const std_msgs::Empty& reset_msg) {

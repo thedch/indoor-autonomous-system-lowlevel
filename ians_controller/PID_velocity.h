@@ -49,16 +49,15 @@ class PID_velocity
         float prev_vel[ROLLING_PTS] = { 0 };
 
     public: 
-        PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,float Kp,float Ki,int timeout_tick);
+        PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,float Kp,float Ki,float ticks_per_m);
+        float pid_target;        
         void calc_velocity();
         void append_vel(double val);
         void calc_rolling_vel();
         void do_pid();
         void cumulative_enc_val(int enc);
-//        void process_vel_target(std_msgs::Float32 msg);
-        void test_motor_control(std_msgs::Float32 msg);
-        float pid_target;
-        void pid_spin(float v_target);
+        void test_motor_control(std_msgs::Float32 msg);        
+        void pid_spin();
 };
 
 #endif
