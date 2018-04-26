@@ -31,8 +31,7 @@ PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,floa
     encoder_low_wrap = (encoder_max - encoder_min) * 0.3 + encoder_min; // 10k
     encoder_high_wrap = (encoder_max - encoder_min) * 0.7 + encoder_min; // 22k
     wheel_latest = 0.0;
-    rolling_pts = 5;
-    prev_vel[ROLLING_PTS] = { 0 }; // all elements 0
+//    prev_vel[ROLLING_PTS] = { 0 }; // all elements 0
 }
 
 void PID_velocity::calc_velocity() {
@@ -144,7 +143,6 @@ void PID_velocity::pid_spin(std_msgs::Float32 target_msg) {
         calc_velocity();
         do_pid();
         motor_msg.data = pid_motor;
-        Serial.println(motor_msg.data);
         //call motor command motors
         motor.motor_cmd(motor_msg);
         ticks_since_target += 1;
