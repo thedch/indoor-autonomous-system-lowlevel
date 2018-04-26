@@ -24,7 +24,15 @@ rosrun rosserial_python serial_node.py /dev/ttyACM[#]
 
 Where the number represents the USB port (usually 0 or 1). An easy way to check that USB port is currently active is `ls /dev | grep ACM`. 
 
-## How To Reset Enocder Values Through ROS
+## How To echo rostopics
+
+In order to reset encoder values, run the following command:
+
+```
+rostopic echo /imu_data
+```
+
+## How To Reset Encoder Values Through ROS
 
 In order to reset encoder values, run the following command:
 
