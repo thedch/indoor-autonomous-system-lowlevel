@@ -101,9 +101,6 @@ void loop() {
 }
 
 void run_PID() {  
-  r_pid.pid_target = 0.3;
-  l_pid.pid_target = 0.3; // TODO: Delete this, only set in callback
-  
   r_pid.pid_spin();
   l_pid.pid_spin();
 }
