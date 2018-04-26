@@ -8,16 +8,16 @@
 #include <Arduino.h>
 
 // Motor Pin Defines
-#define LEFT_PWM_PIN 2
-#define LEFT_MOTOR_EN1 24
-#define LEFT_MOTOR_EN2 25
-#define RIGHT_PWM_PIN 23
-#define RIGHT_MOTOR_EN1 21
-#define RIGHT_MOTOR_EN2 22
-#define LEFT_ENCODER_PIN1 32
+#define RIGHT_PWM_PIN 2
+#define RIGHT_MOTOR_EN1 24
+#define RIGHT_MOTOR_EN2 25
+#define LEFT_PWM_PIN 23
+#define LEFT_MOTOR_EN1 21
+#define LEFT_MOTOR_EN2 22
+#define LEFT_ENCODER_PIN1 34
 #define LEFT_ENCODER_PIN2 33
-#define RIGHT_ENCODER_PIN1 34
-#define RIGHT_ENCODER_PIN2 31
+#define RIGHT_ENCODER_PIN1 31
+#define RIGHT_ENCODER_PIN2 32
 #define BAUD_RATE 9600
 
 //PID Constants
