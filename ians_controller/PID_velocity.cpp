@@ -2,7 +2,7 @@
 #include "PID_velocity.h"
 
 PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,float Kp,float Ki,int timeout_tick) : motor(PWM_PIN, MOTOR_EN1, MOTOR_EN2){
-    pinMode(13, OUTPUT);
+    pinMode(13, OUTPUT); // TODO: Is this needed?
     pid_error = 0;
     pid_target = 0;
     pid_motor = 0;
@@ -22,8 +22,8 @@ PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,floa
     out_min = -255;
     out_max = 255;
     rate = 30;
-    timeout_ticks = timeout_tick;
-    ticks_per_meter = 1527.88;
+    timeout_ticks = timeout_tick; // TODO: Delete this
+    ticks_per_meter = 1527.88; // TODO: This should not be hardcoded, but passed in 
     velocity_threshold = 0.001;
     encoder_min = -32768;
     encoder_max = 32768;
@@ -36,8 +36,8 @@ PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,floa
 void PID_velocity::calc_velocity() {
     // check how much time has elapsed
     double dt_duration = millis() - then; // In milliseconds
-    Serial.print("Inside calc vel, current dt: ");
-    Serial.println(dt_duration);
+//    Serial.print("Inside calc vel, current dt: ");
+//    Serial.println(dt_duration);
     double dt = dt_duration / 1000; // Convert to seconds
     double cur_vel;
     
@@ -91,8 +91,9 @@ void PID_velocity::do_pid() {
     unsigned long pid_dt_duration = millis() - prev_pid_time;
     double pid_dt = pid_dt_duration / 1000.0; // Must cast to float, otherwise int division
     prev_pid_time = millis();
-    Serial.print("Inside do pid, current dt: ");
-    Serial.println(pid_dt_duration);    
+    Serial.println("*********");
+//    Serial.print("Inside do pid, current dt: (milliseconds) ");
+//    Serial.println(pid_dt_duration);
 
     pid_error = pid_target - vel;
     pid_integral = pid_integral + (pid_error * pid_dt); 
@@ -101,14 +102,14 @@ void PID_velocity::do_pid() {
     
     pid_motor = (pid_Kp * pid_error) + (pid_Ki * pid_integral) + (pid_Kd * pid_derivative);
 
-    Serial.print("Your current target is ");
-    Serial.println(pid_target);
     Serial.print("Your current velocity is ");
-    Serial.println(vel);
-    Serial.print("pid_error ");
-    Serial.println(pid_error);
-    Serial.print("Output to the motor is ");
-    Serial.println(pid_motor);
+    Serial.println(vel,5);
+//    Serial.print("pid_error ");
+//    Serial.println(pid_error,5);
+//    Serial.print("pid_integral ");
+//    Serial.println(pid_integral,5);
+//    Serial.print("Output to the motor is ");
+//    Serial.println(pid_motor,5);
     
     if (pid_motor > out_max) {
         pid_motor = out_max;
@@ -139,15 +140,7 @@ void PID_velocity::cumulative_enc_val(int enc) {
     prev_encoder = enc;
 }
 
-// void PID_velocity::process_vel_target(std_msgs::Float32 msg) {
-//     // When we receive a geom twist, this happens
-//     pid_target = msg.data;
-//     ticks_since_target = 0;
-//     calc_velocity();
-//     do_pid();
-// }
-
-void PID_velocity::pid_spin(std_msgs::Float32 target_msg) {
+void PID_velocity::pid_spin(std_msgs::Float32 target_msg) { // TODO: Take a float instead of a msg, unpack the message higher up the stack
   if (ticks_since_target > timeout_ticks) { // This will never happen! Delete this
     then = millis();
     Serial.println("Just reset the 'then' variable!");
@@ -162,12 +155,11 @@ void PID_velocity::pid_spin(std_msgs::Float32 target_msg) {
 
     std_msgs::Float32 motor_msg; // TODO: Put this in a class variable
     pid_target = target_msg.data;
-//    Serial.println("Entering PID spin");    
       
-      calc_velocity();
-      do_pid();
-      motor_msg.data = pid_motor;
-      motor.motor_cmd(motor_msg);
+    calc_velocity();
+    do_pid();
+    motor_msg.data = pid_motor;
+    motor.motor_cmd(motor_msg);
 //      ticks_since_target += 1;
       
 //      Serial.print("Current signal to motor ");

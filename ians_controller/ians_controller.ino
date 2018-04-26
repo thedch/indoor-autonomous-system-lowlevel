@@ -23,11 +23,11 @@
 
 //PID Constants
 #define KP 600
-#define KI 0
+#define KI 200
 #define KD 0
 #define TIMEOUT_TICKS 40
 
-#define ENCODER_RATE 10 // Milliseconds
+#define ENCODER_RATE 7 // Milliseconds
 #define PID_RATE ENCODER_RATE*2 // Milliseconds
 
 // MOTOR FUNCTIONS & VARIABLES
@@ -69,7 +69,8 @@ ros::Subscriber<std_msgs::Float32> lwheel_vtarget_sub("lwheel_vtarget", &lwheel_
 ros::Subscriber<std_msgs::Float32> rwheel_vtarget_sub("rwheel_vtarget", &rwheel_vtarget_callback);
 ros::Subscriber<std_msgs::Empty> reset_encoder_sub("reset_encoders", &encoder_reset_callback);
 
-std_msgs::Float32 target_test;
+std_msgs::Float32 l_wheel_target;
+std_msgs::Float32 r_wheel_target;
 
 void setup() {
   Serial.begin(BAUD_RATE);
@@ -96,9 +97,11 @@ void loop() {
   nh.spinOnce();
 }
 
-void run_PID() {
-  target_test.data = 0.3;
-  l_pid.pid_spin(target_test);
+void run_PID() {  
+  r_wheel_target.data = 0.3;
+  l_wheel_target.data = 0.3; // TODO: These should get set in a callback, not hardcoded
+  r_pid.pid_spin(r_wheel_target);
+  l_pid.pid_spin(l_wheel_target);
 }
 
 void ROS_publisher() {
@@ -127,6 +130,7 @@ void rmotor_callback(const std_msgs::Float32& msg) {
 
 void lwheel_vtarget_callback(const std_msgs::Float32& msg) {
   l_pid.pid_spin(msg);
+  // TODO: Update a global command variable here, and let the interrupt call the PID loop that references the command variable 
 }
 
 void rwheel_vtarget_callback(const std_msgs::Float32& msg) {
