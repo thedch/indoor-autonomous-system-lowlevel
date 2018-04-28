@@ -41,7 +41,7 @@ void PID_velocity::calc_velocity() {
     double cur_vel;
     
     if (wheel_latest == wheel_prev) {
-        Serial.println("No new wheels ticks found in calc velocity");
+//        Serial.println("No new wheels ticks found in calc velocity");
         cur_vel = (1.0 / (double)ticks_per_meter) / dt;
 //            Serial.print("cur_vel");
 //           Serial.println(cur_vel);
@@ -90,7 +90,7 @@ void PID_velocity::do_pid() {
     unsigned long pid_dt_duration = millis() - prev_pid_time;
     double pid_dt = pid_dt_duration / 1000.0; // Must cast to float, otherwise int division
     prev_pid_time = millis();
-    Serial.println("*********");
+//    Serial.println("*********");
 //    Serial.print("Inside do pid, current dt: (milliseconds) ");
 //    Serial.println(pid_dt_duration);
 
@@ -101,8 +101,8 @@ void PID_velocity::do_pid() {
     
     pid_motor = (pid_Kp * pid_error) + (pid_Ki * pid_integral) + (pid_Kd * pid_derivative);
 
-    Serial.print("Your current velocity is ");
-    Serial.println(vel,5);
+//    Serial.print("Your current velocity is ");
+//    Serial.println(vel,5);
 //    Serial.print("pid_error ");
 //    Serial.println(pid_error,5);
 //    Serial.print("pid_integral ");

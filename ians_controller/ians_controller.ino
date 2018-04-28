@@ -19,7 +19,7 @@
 #define LEFT_ENCODER_PIN2 33
 #define RIGHT_ENCODER_PIN1 31
 #define RIGHT_ENCODER_PIN2 32
-#define BAUD_RATE 9600
+#define BAUD_RATE 115200
 
 // PID params
 #define KP 600
@@ -40,24 +40,24 @@ Encoder rmotor_encoder(RIGHT_ENCODER_PIN1, RIGHT_ENCODER_PIN2);
 PID_velocity l_pid(LEFT_PWM_PIN, LEFT_MOTOR_EN1, LEFT_MOTOR_EN2, KD, KP, KI, L_TICKS_PER_METER);  
 PID_velocity r_pid(RIGHT_PWM_PIN, RIGHT_MOTOR_EN1, RIGHT_MOTOR_EN2, KD, KP, KI, R_TICKS_PER_METER);
 
-IntervalTimer encoder_timer; // interrupt to publish encoder values at 10hz
-IntervalTimer PID_timer; // interrupt to check PID loop 
+IntervalTimer encoder_timer; // interrupt to publish encoder values
+IntervalTimer PID_timer; // interrupt to check PID loop
 
 int16_t lenc_val = 0; // initialize encoder values
 int16_t renc_val = 0;
 
 //IMU
-//IMU robot_imu;
+IMU robot_imu;
 
 // ROS FUNCTIONS & VARIABLES
 ros::NodeHandle nh;
 std_msgs::Int16 lwheel_msg, rwheel_msg;
-//sensor_msgs::Imu IMU_msg;
-//sensor_msgs::MagneticField MF_msg;
+sensor_msgs::Imu IMU_msg;
+sensor_msgs::MagneticField MF_msg;
 ros::Publisher lwheel("lwheel", &lwheel_msg);
 ros::Publisher rwheel("rwheel", &rwheel_msg);
-//ros::Publisher imu_data("imu_data", &IMU_msg);
-//ros::Publisher compass("compass", &MF_msg);
+ros::Publisher imu_data("imu_data", &IMU_msg);
+ros::Publisher compass("compass", &MF_msg);
 void ROS_publisher();
 void run_PID();
 
@@ -85,8 +85,8 @@ void setup() {
   nh.initNode();
   nh.advertise(lwheel);
   nh.advertise(rwheel);
-//  nh.advertise(imu_data);
-//  nh.advertise(compass);
+  nh.advertise(imu_data);
+  nh.advertise(compass);
   nh.subscribe(lmotor_sub);
   nh.subscribe(rmotor_sub);
   nh.subscribe(lwheel_vtarget_sub);
@@ -100,23 +100,41 @@ void loop() {
   nh.spinOnce();
 }
 
-void run_PID() {  
+void run_PID() {
+//  l_pid.pid_target = 0.3;
+//  r_pid.pid_target = 0.3;
+  
   r_pid.pid_spin();
   l_pid.pid_spin();
 }
 
 void ROS_publisher() {
+  static double then;
+  
   // Send the odom to the Pi for the nav stack
   lwheel_msg.data = (lmotor_encoder.read() / 4);
   rwheel_msg.data = (rmotor_encoder.read() / 4);
-  lwheel.publish(&lwheel_msg);  
-  rwheel.publish(&rwheel_msg);
-  //Publish IMU data
-  //IMU_msg = robot_imu.read_IMUmsg_data();
-  //imu_data.publish(&IMU_msg);
-  //MF_msg = robot_imu.read_compass();
-//  compass.publish(&MF_msg);
+
+  static int encoder_counter = 0;
+  encoder_counter++;
+  if (encoder_counter > 14) {
+//    double dt_duration = millis() - then; // In milliseconds
+//    then = millis();
+//    Serial.print("Inside ROS Publisher, current dt: ");
+//    Serial.println(dt_duration);
+  
+    lwheel.publish(&lwheel_msg);
+    rwheel.publish(&rwheel_msg);
+    encoder_counter = 0;
+  }
+  
+  // Publish IMU data
+   IMU_msg = robot_imu.read_IMUmsg_data();
+   imu_data.publish(&IMU_msg);
+   MF_msg = robot_imu.read_compass();
+   compass.publish(&MF_msg);
   // Update the PID controller with the current odom
+  
   l_pid.cumulative_enc_val(lwheel_msg.data);
   r_pid.cumulative_enc_val(rwheel_msg.data);
 }
