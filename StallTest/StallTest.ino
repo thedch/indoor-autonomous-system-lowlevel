@@ -24,31 +24,23 @@ Motors right_motor(RIGHT_PWM_PIN,RIGHT_MOTOR_EN1,RIGHT_MOTOR_EN2);
 int ticksR = 0;
 int ticksL = 0;
 // Declaration of variables for state machine.
-int timeR = 0; // Time variable for right wheel
+int timer = 0; // Time variable for wheel
 int newTicksR = 0; // Used to capture initial right wheel position
-int timeL = 0;
-int newTicksL = 0;
+int newTicksL = 0; // Used to capture initial left wheel position
 
-enum RightWheelState { // States for right wheel
-  MovingR,
-  StalledR,
-  TurnOffR
+enum WheelState { // States for right wheel
+  Moving,
+  Stalled,
+  TurnOff,
+  GoBack
 };
-enum RightWheelState RightWheelCurrentState = MovingR;
-
-enum LeftWheelState { // States for left wheel
-  MovingL,
-  StalledL,
-  TurnOffL
-};
-enum LeftWheelState LeftWheelCurrentState = MovingL;
+enum WheelState WheelCurrentState = Moving;
 
 long oldRightWheelPosition = -999;  // From encoders test on Arduino example.
 long oldLeftWheelPosition  = -999;
 
 std_msgs::Float32 right_motorspeed;
 std_msgs::Float32 left_motorspeed;
-
 
 void setup() {  
  Serial.begin(9600);
@@ -64,8 +56,6 @@ void loop() {
   long RightWheelPosition = myEnc2.read(); // Grabs current encoder reading.
   long LeftWheelPosition = myEnc1.read();
   Serial.println("Begin State");
-//  delay(1000);
-
   
   if (RightWheelPosition != oldRightWheelPosition) {
     oldRightWheelPosition = RightWheelPosition;
@@ -78,73 +68,54 @@ void loop() {
   }
 
 
-///// begin right wheel state machine ///
-  switch (RightWheelCurrentState) {
-    case (MovingR):
-      Serial.println("Moving R");
+///// begin wheel state machine ///
+  switch (WheelCurrentState) {
+    case (Moving):
       newTicksR = ticksR;
-     
-      if  (right_motorspeed.data != 0)  { // transistions to next state is always true. This state initializes the time.
-        Serial.println(right_motorspeed.data);
-        RightWheelCurrentState = StalledR;
-        timeR = millis();
+      newTicksL = ticksL;
+      if  ((right_motorspeed.data != 0) || (left_motorspeed.data != 0))  { // This state initializes the time and captures wheel position.
+        WheelCurrentState = Stalled;
+        timer = millis();
       }
       break;
 
-    case (StalledR): // Checks if parameters of stall are met.
-      Serial.println("StalledR");
-      if ( (ticksR == newTicksR) && (right_motorspeed.data != 0) && ( (millis() - timeR) > 1000) ) {
-        RightWheelCurrentState = TurnOffR;
+    case (Stalled): // Checks if parameters of stall are met.
+      Serial.println("Stalled");
+      if ( (((ticksR == newTicksR) && (right_motorspeed.data != 0)) || ((ticksL == newTicksL) && (left_motorspeed.data != 0))) && ((millis() - timer) > 1000) ) {
+        WheelCurrentState = TurnOff;
+        timer = millis();
       }
-      if (ticksR != newTicksR) {
-       RightWheelCurrentState = MovingR;
+      if ((ticksR != newTicksR) && (ticksL != newTicksL)) {
+        WheelCurrentState = Moving;
       }
       break;
       
-    case (TurnOffR):
-      Serial.print("You're in right wheel turn off state.");
+    case (TurnOff):
+      Serial.print("You're in turn off state.");
       Serial.print("\r\n");
       left_motorspeed.data = 0;
       right_motorspeed.data = 0;
       left_motor.motor_cmd(left_motorspeed);
       right_motor.motor_cmd(right_motorspeed);
+      if((millis() - timer) > 2500){
+        WheelCurrentState = GoBack;
+        timer = millis();        
+      }
       break;
-  
+    case(GoBack):
+      left_motorspeed.data = -50;
+      right_motorspeed.data = -50;
+      left_motor.motor_cmd(left_motorspeed);
+      right_motor.motor_cmd(right_motorspeed);
+      if((millis() - timer) > 3000){
+        WheelCurrentState = Moving;
+        left_motorspeed.data = 0;
+        right_motorspeed.data = 0;
+        left_motor.motor_cmd(left_motorspeed);
+        right_motor.motor_cmd(right_motorspeed);
+      }
+      break;
     default:
-     break;
+      break;
 }
-
-/// begin left wheel state machine ///
-//switch (LeftWheelCurrentState) {
-//case (MovingL):
-//  Serial.println("MovingL");
-//  newTicksL = ticksL;
-//  if ( (left_motorspeed.data != 0) && (newTicksL == ticksL) ) { // transistions to next state is always true. This state initializes the time.
-//  LeftWheelCurrentState == StalledR;
-//  timeL = millis();
-//  }
-//  break;
-//
-//case (StalledL): // Checks if parameters of stall are met.
-//    Serial.println("StalledL");
-//    if ( (ticksL == newTicksL) && (left_motorspeed.data != 0) && ( (millis() - timeL) > 1000) ) {
-//    LeftWheelCurrentState = TurnOffL;
-//  }
-//if (ticksL != newTicksL) {
-//  LeftWheelCurrentState = MovingL;
-//}
-//break;
-//case (TurnOffL):
-//  Serial.print("You're in left wheel turn off state.");
-//  Serial.print("\r\n");
-//  left_motorspeed.data = 0;
-//  right_motorspeed.data = 0;
-//  left_motor.motor_cmd(left_motorspeed);
-//  right_motor.motor_cmd(right_motorspeed);
-//
-//  break;
-//  
-//  default:
-//  break;
-//}
 }
