@@ -127,7 +127,7 @@ void ROS_publisher() {
     // Publish IMU data
     auto quat_data = robot_imu.read_IMUmsg_data();
     quatw_msg = std::get<0>(quat_data);
-    quatw_msg = std::get<1>(quat_data);
+    quatz_msg = std::get<1>(quat_data);
     quatw.publish(&quatw_msg);
     quatz.publish(&quatz_msg);    
 //    imu_data.publish(&IMU_msg);
