@@ -7,6 +7,8 @@
 #include <std_msgs/Empty.h>
 #include <Encoder.h>
 #include <Arduino.h>
+#include <tuple>
+
 
 // Motor Pin Defines
 #define RIGHT_PWM_PIN 2
@@ -52,12 +54,14 @@ IMU robot_imu;
 // ROS FUNCTIONS & VARIABLES
 ros::NodeHandle nh;
 std_msgs::Int16 lwheel_msg, rwheel_msg;
-sensor_msgs::Imu IMU_msg;
-sensor_msgs::MagneticField MF_msg;
+std_msgs::Float32 quatz_msg, quatw_msg;
+//sensor_msgs::Imu IMU_msg;
 ros::Publisher lwheel("lwheel", &lwheel_msg);
 ros::Publisher rwheel("rwheel", &rwheel_msg);
-ros::Publisher imu_data("imu_data", &IMU_msg);
-ros::Publisher compass("compass", &MF_msg);
+//ros::Publisher imu_data("imu_data", &IMU_msg);
+ros::Publisher quatz("quat_z", &quatz_msg);
+ros::Publisher quatw("quat_w", &quatw_msg);
+//ros::Publisher compass("compass", &MF_msg);
 void ROS_publisher();
 void run_PID();
 
@@ -85,8 +89,10 @@ void setup() {
   nh.initNode();
   nh.advertise(lwheel);
   nh.advertise(rwheel);
-  nh.advertise(imu_data);
-  nh.advertise(compass);
+//  nh.advertise(imu_data);
+  nh.advertise(quatz);
+  nh.advertise(quatw);
+//  nh.advertise(compass);
   nh.subscribe(lmotor_sub);
   nh.subscribe(rmotor_sub);
   nh.subscribe(lwheel_vtarget_sub);
@@ -100,10 +106,7 @@ void loop() {
   nh.spinOnce();
 }
 
-void run_PID() {
-//  l_pid.pid_target = 0.3;
-//  r_pid.pid_target = 0.3;
-  
+void run_PID() {  
   r_pid.pid_spin();
   l_pid.pid_spin();
 }
@@ -118,21 +121,18 @@ void ROS_publisher() {
   static int encoder_counter = 0;
   encoder_counter++;
   if (encoder_counter > 14) {
-//    double dt_duration = millis() - then; // In milliseconds
-//    then = millis();
-//    Serial.print("Inside ROS Publisher, current dt: ");
-//    Serial.println(dt_duration);
-  
     lwheel.publish(&lwheel_msg);
     rwheel.publish(&rwheel_msg);
     encoder_counter = 0;
+    // Publish IMU data
+    auto quat_data = robot_imu.read_IMUmsg_data();
+    quatw_msg = std::get<0>(quat_data);
+    quatw_msg = std::get<1>(quat_data);
+    quatw.publish(&quatw_msg);
+    quatz.publish(&quatz_msg);    
+//    imu_data.publish(&IMU_msg);
   }
   
-  // Publish IMU data
-   IMU_msg = robot_imu.read_IMUmsg_data();
-   imu_data.publish(&IMU_msg);
-   MF_msg = robot_imu.read_compass();
-   compass.publish(&MF_msg);
   // Update the PID controller with the current odom
   
   l_pid.cumulative_enc_val(lwheel_msg.data);
