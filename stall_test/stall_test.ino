@@ -43,8 +43,8 @@ std_msgs::Float32 right_motorspeed;
 std_msgs::Float32 left_motorspeed;
 
 void setup() {
-    Serial.begin(9600);
-    right_motorspeed.data = 128 ;
+    Serial.begin(9600); // TODO: Why are you using 9600? Please see the other file for the correct (#defined) baud rate
+    right_motorspeed.data = 128; // TODO: Why are you manually commanding the motors?
     left_motorspeed.data = 128;
     left_motor.motor_cmd(left_motorspeed);
     right_motor.motor_cmd(right_motorspeed);
@@ -65,7 +65,7 @@ void loop() {
         ticksL = LeftWheelPosition / 4;
     }
 
-// begin wheel state machine
+    // begin wheel state machine
     switch (WheelCurrentState) {
     case (Moving):
         newTicksR = ticksR;

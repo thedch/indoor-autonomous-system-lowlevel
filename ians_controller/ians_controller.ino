@@ -9,7 +9,6 @@
 #include <Arduino.h>
 #include <tuple>
 
-
 // Motor Pin Defines
 #define RIGHT_PWM_PIN 2
 #define RIGHT_MOTOR_EN1 24
@@ -130,7 +129,6 @@ void ROS_publisher() {
     }
 
     // Update the PID controller with the current odom
-
     l_pid.cumulative_enc_val(lwheel_msg.data);
     r_pid.cumulative_enc_val(rwheel_msg.data);
 }

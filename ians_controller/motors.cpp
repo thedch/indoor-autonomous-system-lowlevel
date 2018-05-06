@@ -84,7 +84,7 @@ void Motors::motor_brake() {
     digitalWrite(m_dir2, LOW);
 }
 
-void Motors::check_motor_stall(float curr_enocder_val) {
+void Motors::check_motor_stall(float curr_enocder_val) { // TODO: Please spell words correctly
     Serial.println("Begin State");
     std_msgs::Float32 motorspeed;
 ///// begin wheel state machine ///
