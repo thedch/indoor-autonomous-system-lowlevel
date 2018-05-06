@@ -46,12 +46,11 @@ IntervalTimer encoder_timer; // interrupt to publish encoder values
 IntervalTimer PID_timer; // interrupt to check PID loop
 
 int16_t lenc_val = 0; // initialize encoder values
-int16_t renc_val = 0;
+int16_t renc_val = 0; // TODO: Where are these variables used?
 
 int l_halt_highlevel = 0;
 int r_halt_highlevel = 0;
 
-//IMU
 IMU robot_imu;
 
 // ROS FUNCTIONS & VARIABLES
@@ -81,7 +80,7 @@ ros::Subscriber<std_msgs::Empty> reset_encoder_sub("reset_encoders", &encoder_re
 
 void setup() {
     Serial.begin(BAUD_RATE);
-    // Encoder Interrupt set up
+    // Interrupt set up
     encoder_timer.begin(ROS_publisher, ENCODER_RATE * 1000); // Convert to microseconds
     PID_timer.begin(run_PID, PID_RATE * 1000); // Convert to microseconds
 
@@ -108,12 +107,11 @@ void run_PID() {
 }
 
 void ROS_publisher() {
-    static double then;
     // Send the odom to the Pi for the nav stack
     lwheel_msg.data = (lmotor_encoder.read() / 4);
     rwheel_msg.data = (rmotor_encoder.read() / 4);
 
-    //check for motor stall
+    // check for motor stall
     l_halt_highlevel = l_pid.check_motor_stall(lwheel_msg.data);
     r_halt_highlevel = r_pid.check_motor_stall(rwheel_msg.data);
 
@@ -129,7 +127,6 @@ void ROS_publisher() {
         quatz_msg = std::get<1>(quat_data);
         quatw.publish(&quatw_msg);
         quatz.publish(&quatz_msg);
-//    imu_data.publish(&IMU_msg);
     }
 
     // Update the PID controller with the current odom
@@ -149,7 +146,7 @@ void lwheel_vtarget_callback(const std_msgs::Float32& msg) {
 }
 
 void rwheel_vtarget_callback(const std_msgs::Float32& msg) {
-    if ((r_halt_highlevel == 1) || (l_halt_highlevel == 1)) {
+    if ((r_halt_highlevel == 1) || (l_halt_highlevel == 1)) { // TODO: Why are you checking both left and right when you're only setting the right?
         r_pid.pid_target = 0;
     } else if ((r_halt_highlevel == 2) || (l_halt_highlevel == 2)) {
         r_pid.pid_target = -0.3;
