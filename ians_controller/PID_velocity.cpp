@@ -90,6 +90,9 @@ void PID_velocity::do_pid() {
     unsigned long pid_dt_duration = millis() - prev_pid_time;
     double pid_dt = pid_dt_duration / 1000.0; // Must cast to float, otherwise int division
     prev_pid_time = millis();
+//    Serial.println("*********");
+//    Serial.print("Inside do pid, current dt: (milliseconds) ");
+//    Serial.println(pid_dt_duration);
 
     pid_error = pid_target - vel;
     pid_integral = pid_integral + (pid_error * pid_dt); 
@@ -97,6 +100,15 @@ void PID_velocity::do_pid() {
     pid_previous_error = pid_error;
     
     pid_motor = (pid_Kp * pid_error) + (pid_Ki * pid_integral) + (pid_Kd * pid_derivative);
+
+//    Serial.print("Your current velocity is ");
+//    Serial.println(vel,5);
+//    Serial.print("pid_error ");
+//    Serial.println(pid_error,5);
+//    Serial.print("pid_integral ");
+//    Serial.println(pid_integral,5);
+//    Serial.print("Output to the motor is ");
+//    Serial.println(pid_motor,5);
     
     if (pid_motor > out_max) {
         pid_motor = out_max;
@@ -135,8 +147,7 @@ void PID_velocity::pid_spin() {
     motor.motor_cmd(motor_msg);
 }
 
-int PID_velocity::check_motor_stall(float curr_enocder_val){
-  motor.check_motor_stall(curr_enocder_val);
-  return motor.halt_highlevel;
+void PID_velocity::test_motor_control(std_msgs::Float32 msg){
+  motor.motor_cmd(msg);
 }
 

@@ -48,9 +48,6 @@ IntervalTimer PID_timer; // interrupt to check PID loop
 int16_t lenc_val = 0; // initialize encoder values
 int16_t renc_val = 0;
 
-int l_halt_highlevel = 0;
-int r_halt_highlevel = 0;
-
 //IMU
 IMU robot_imu;
 
@@ -67,14 +64,17 @@ ros::Publisher quatw("quat_w", &quatw_msg);
 //ros::Publisher compass("compass", &MF_msg);
 void ROS_publisher();
 void run_PID();
-void check_motor_stall();
 
 // Callback headers to be used when a ROS topic publish is received
+void lmotor_callback(const std_msgs::Float32& msg);
+void rmotor_callback(const std_msgs::Float32& msg);
 void lwheel_vtarget_callback(const std_msgs::Float32& msg);
 void rwheel_vtarget_callback(const std_msgs::Float32& msg);
 void encoder_reset_callback(const std_msgs::Empty& reset_msg);
 
 // Subscribers to ROS topics
+ros::Subscriber<std_msgs::Float32> lmotor_sub("lmotor", &lmotor_callback);
+ros::Subscriber<std_msgs::Float32> rmotor_sub("rmotor", &rmotor_callback);
 ros::Subscriber<std_msgs::Float32> lwheel_vtarget_sub("lwheel_vtarget", &lwheel_vtarget_callback);
 ros::Subscriber<std_msgs::Float32> rwheel_vtarget_sub("rwheel_vtarget", &rwheel_vtarget_callback);
 ros::Subscriber<std_msgs::Empty> reset_encoder_sub("reset_encoders", &encoder_reset_callback);
@@ -89,8 +89,12 @@ void setup() {
   nh.initNode();
   nh.advertise(lwheel);
   nh.advertise(rwheel);
+//  nh.advertise(imu_data);
   nh.advertise(quatz);
   nh.advertise(quatw);
+//  nh.advertise(compass);
+  nh.subscribe(lmotor_sub);
+  nh.subscribe(rmotor_sub);
   nh.subscribe(lwheel_vtarget_sub);
   nh.subscribe(rwheel_vtarget_sub);
   nh.subscribe(reset_encoder_sub);
@@ -109,13 +113,10 @@ void run_PID() {
 
 void ROS_publisher() {
   static double then;
+  
   // Send the odom to the Pi for the nav stack
   lwheel_msg.data = (lmotor_encoder.read() / 4);
   rwheel_msg.data = (rmotor_encoder.read() / 4);
-
-  //check for motor stall
-  l_halt_highlevel = l_pid.check_motor_stall(lwheel_msg.data);
-  r_halt_highlevel = r_pid.check_motor_stall(rwheel_msg.data);
 
   static int encoder_counter = 0;
   encoder_counter++;
@@ -138,24 +139,20 @@ void ROS_publisher() {
   r_pid.cumulative_enc_val(rwheel_msg.data);
 }
 
+void lmotor_callback(const std_msgs::Float32& msg) {
+  l_pid.test_motor_control(msg);
+}
+
+void rmotor_callback(const std_msgs::Float32& msg) {
+  r_pid.test_motor_control(msg);
+}
+
 void lwheel_vtarget_callback(const std_msgs::Float32& msg) {
-  if((r_halt_highlevel == 1) || (l_halt_highlevel == 1)){
-    l_pid.pid_target = 0;
-  } else if((r_halt_highlevel == 2) || (l_halt_highlevel == 2)){
-    l_pid.pid_target = -0.3;
-  } else{
-    l_pid.pid_target = msg.data;
-  }
+  l_pid.pid_target = msg.data;
 }
 
 void rwheel_vtarget_callback(const std_msgs::Float32& msg) {
-  if((r_halt_highlevel == 1) || (l_halt_highlevel == 1)){
-    r_pid.pid_target = 0;
-  } else if((r_halt_highlevel == 2) || (l_halt_highlevel == 2)){
-    r_pid.pid_target = -0.3;
-  } else{
-    r_pid.pid_target = msg.data;
-  }
+  r_pid.pid_target = msg.data;
 }
 
 void encoder_reset_callback(const std_msgs::Empty& reset_msg) {
