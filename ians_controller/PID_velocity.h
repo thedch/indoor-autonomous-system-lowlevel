@@ -56,8 +56,8 @@ class PID_velocity
         void calc_rolling_vel();
         void do_pid();
         void cumulative_enc_val(int enc);
-        void test_motor_control(std_msgs::Float32 msg);        
         void pid_spin();
+        int check_motor_stall(float curr_enocder_val);
 };
 
 #endif
