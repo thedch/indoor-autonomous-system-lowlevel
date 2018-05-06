@@ -21,11 +21,24 @@ class Motors
     int m_dir2;
     void motor_forward(float motor_speed);
     void motor_reverse(float motor_speed);
-    void motor_brake();   
+    void motor_brake();
+    int timer; // Time variable for wheel
+    int newTicks; // Used to capture initial right wheel position
+    float last_motor_cmd;
+    enum WheelState { // State for wheel
+      Moving,
+      Stalled,
+      TurnOff,
+      GoBack
+    };
+    enum WheelState WheelCurrentState = Moving;
+
   
   public:
     Motors(int pwm_Pin, int motor_direction_pin1, int motor_direction_pin2);
     void motor_cmd(std_msgs::Float32 motor_speed);
+    void check_motor_stall(float curr_enocder_val);
+    int halt_highlevel;
 };
 
 #endif

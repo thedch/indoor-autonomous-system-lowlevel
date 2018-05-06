@@ -51,8 +51,6 @@ void setup() {
 }
  
 void loop() {
-  
-
   long RightWheelPosition = myEnc2.read(); // Grabs current encoder reading.
   long LeftWheelPosition = myEnc1.read();
   Serial.println("Begin State");
@@ -117,5 +115,5 @@ void loop() {
       break;
     default:
       break;
-}
+  }
 }
