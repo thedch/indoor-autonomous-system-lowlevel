@@ -1,4 +1,4 @@
-#include "Motors.h"
+#include "motors.h"
 #include "PID_velocity.h"
 #include "IMU.h"
 #include <ros.h>
@@ -39,7 +39,7 @@ Encoder lmotor_encoder(LEFT_ENCODER_PIN1, LEFT_ENCODER_PIN2);
 Encoder rmotor_encoder(RIGHT_ENCODER_PIN1, RIGHT_ENCODER_PIN2);
 
 // PID controller that creates own motor object
-PID_velocity l_pid(LEFT_PWM_PIN, LEFT_MOTOR_EN1, LEFT_MOTOR_EN2, KD, KP, KI, L_TICKS_PER_METER);  
+PID_velocity l_pid(LEFT_PWM_PIN, LEFT_MOTOR_EN1, LEFT_MOTOR_EN2, KD, KP, KI, L_TICKS_PER_METER);
 PID_velocity r_pid(RIGHT_PWM_PIN, RIGHT_MOTOR_EN1, RIGHT_MOTOR_EN2, KD, KP, KI, R_TICKS_PER_METER);
 
 IntervalTimer encoder_timer; // interrupt to publish encoder values
@@ -80,87 +80,87 @@ ros::Subscriber<std_msgs::Float32> rwheel_vtarget_sub("rwheel_vtarget", &rwheel_
 ros::Subscriber<std_msgs::Empty> reset_encoder_sub("reset_encoders", &encoder_reset_callback);
 
 void setup() {
-  Serial.begin(BAUD_RATE);
-  // Encoder Interrupt set up
-  encoder_timer.begin(ROS_publisher, ENCODER_RATE*1000); // Convert to microseconds
-  PID_timer.begin(run_PID, PID_RATE*1000); // Convert to microseconds
-  
-  // ROS Node Setup
-  nh.initNode();
-  nh.advertise(lwheel);
-  nh.advertise(rwheel);
-  nh.advertise(quatz);
-  nh.advertise(quatw);
-  nh.subscribe(lwheel_vtarget_sub);
-  nh.subscribe(rwheel_vtarget_sub);
-  nh.subscribe(reset_encoder_sub);
+    Serial.begin(BAUD_RATE);
+    // Encoder Interrupt set up
+    encoder_timer.begin(ROS_publisher, ENCODER_RATE * 1000); // Convert to microseconds
+    PID_timer.begin(run_PID, PID_RATE * 1000); // Convert to microseconds
+
+    // ROS Node Setup
+    nh.initNode();
+    nh.advertise(lwheel);
+    nh.advertise(rwheel);
+    nh.advertise(quatz);
+    nh.advertise(quatw);
+    nh.subscribe(lwheel_vtarget_sub);
+    nh.subscribe(rwheel_vtarget_sub);
+    nh.subscribe(reset_encoder_sub);
 }
 
 // Main Loop
 void loop() {
-  // Sit and spin and wait for message publications from the Pi
-  nh.spinOnce();
+    // Sit and spin and wait for message publications from the Pi
+    nh.spinOnce();
 }
 
-void run_PID() {  
-  r_pid.pid_spin();
-  l_pid.pid_spin();
+void run_PID() {
+    r_pid.pid_spin();
+    l_pid.pid_spin();
 }
 
 void ROS_publisher() {
-  static double then;
-  // Send the odom to the Pi for the nav stack
-  lwheel_msg.data = (lmotor_encoder.read() / 4);
-  rwheel_msg.data = (rmotor_encoder.read() / 4);
+    static double then;
+    // Send the odom to the Pi for the nav stack
+    lwheel_msg.data = (lmotor_encoder.read() / 4);
+    rwheel_msg.data = (rmotor_encoder.read() / 4);
 
-  //check for motor stall
-  l_halt_highlevel = l_pid.check_motor_stall(lwheel_msg.data);
-  r_halt_highlevel = r_pid.check_motor_stall(rwheel_msg.data);
+    //check for motor stall
+    l_halt_highlevel = l_pid.check_motor_stall(lwheel_msg.data);
+    r_halt_highlevel = r_pid.check_motor_stall(rwheel_msg.data);
 
-  static int encoder_counter = 0;
-  encoder_counter++;
-  if (encoder_counter > 14) {
-    lwheel.publish(&lwheel_msg);
-    rwheel.publish(&rwheel_msg);
-    encoder_counter = 0;
-    // Publish IMU data
-    auto quat_data = robot_imu.read_IMUmsg_data();
-    quatw_msg = std::get<0>(quat_data);
-    quatz_msg = std::get<1>(quat_data);
-    quatw.publish(&quatw_msg);
-    quatz.publish(&quatz_msg);    
+    static int encoder_counter = 0;
+    encoder_counter++;
+    if (encoder_counter > 14) {
+        lwheel.publish(&lwheel_msg);
+        rwheel.publish(&rwheel_msg);
+        encoder_counter = 0;
+        // Publish IMU data
+        auto quat_data = robot_imu.read_IMUmsg_data();
+        quatw_msg = std::get<0>(quat_data);
+        quatz_msg = std::get<1>(quat_data);
+        quatw.publish(&quatw_msg);
+        quatz.publish(&quatz_msg);
 //    imu_data.publish(&IMU_msg);
-  }
-  
-  // Update the PID controller with the current odom
-  
-  l_pid.cumulative_enc_val(lwheel_msg.data);
-  r_pid.cumulative_enc_val(rwheel_msg.data);
+    }
+
+    // Update the PID controller with the current odom
+
+    l_pid.cumulative_enc_val(lwheel_msg.data);
+    r_pid.cumulative_enc_val(rwheel_msg.data);
 }
 
 void lwheel_vtarget_callback(const std_msgs::Float32& msg) {
-  if((r_halt_highlevel == 1) || (l_halt_highlevel == 1)){
-    l_pid.pid_target = 0;
-  } else if((r_halt_highlevel == 2) || (l_halt_highlevel == 2)){
-    l_pid.pid_target = -0.3;
-  } else{
-    l_pid.pid_target = msg.data;
-  }
+    if ((r_halt_highlevel == 1) || (l_halt_highlevel == 1)) {
+        l_pid.pid_target = 0;
+    } else if ((r_halt_highlevel == 2) || (l_halt_highlevel == 2)) {
+        l_pid.pid_target = -0.3;
+    } else {
+        l_pid.pid_target = msg.data;
+    }
 }
 
 void rwheel_vtarget_callback(const std_msgs::Float32& msg) {
-  if((r_halt_highlevel == 1) || (l_halt_highlevel == 1)){
-    r_pid.pid_target = 0;
-  } else if((r_halt_highlevel == 2) || (l_halt_highlevel == 2)){
-    r_pid.pid_target = -0.3;
-  } else{
-    r_pid.pid_target = msg.data;
-  }
+    if ((r_halt_highlevel == 1) || (l_halt_highlevel == 1)) {
+        r_pid.pid_target = 0;
+    } else if ((r_halt_highlevel == 2) || (l_halt_highlevel == 2)) {
+        r_pid.pid_target = -0.3;
+    } else {
+        r_pid.pid_target = msg.data;
+    }
 }
 
 void encoder_reset_callback(const std_msgs::Empty& reset_msg) {
-  lenc_val = 0;
-  renc_val = 0;
-  lmotor_encoder.write(0);
-  rmotor_encoder.write(0);
+    lenc_val = 0;
+    renc_val = 0;
+    lmotor_encoder.write(0);
+    rmotor_encoder.write(0);
 }

@@ -16,13 +16,13 @@
 
 class IMU
 {
-  private:
-    Adafruit_BNO055 bno;
-    void read_compass();
-    
-  public:
-    IMU();
-    std::tuple<std_msgs::Float32,std_msgs::Float32> read_IMUmsg_data();
+    private:
+        Adafruit_BNO055 bno;
+        void read_compass();
+
+    public:
+        IMU();
+        std::tuple<std_msgs::Float32, std_msgs::Float32> read_IMUmsg_data();
 
 };
 
