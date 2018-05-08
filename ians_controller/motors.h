@@ -13,7 +13,7 @@
 #include <std_msgs/Float32.h>
 
 
-class Motors
+class motors
 {
   private:
     int PWM_pin;
@@ -35,9 +35,9 @@ class Motors
 
   
   public:
-    Motors(int pwm_Pin, int motor_direction_pin1, int motor_direction_pin2);
-    void motor_cmd(std_msgs::Float32 motor_speed);
-    void check_motor_stall(float curr_enocder_val);
+    motors(int pwm_Pin, int motor_direction_pin1, int motor_direction_pin2);
+    void motor_cmd(float motor_speed);
+    void check_motor_stall(float curr_encoder_val);
     int halt_highlevel;
 };
 

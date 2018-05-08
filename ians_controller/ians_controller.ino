@@ -44,9 +44,6 @@ PID_velocity r_pid(RIGHT_PWM_PIN, RIGHT_MOTOR_EN1, RIGHT_MOTOR_EN2, KD, KP, KI, 
 IntervalTimer encoder_timer; // interrupt to publish encoder values
 IntervalTimer PID_timer; // interrupt to check PID loop
 
-int16_t lenc_val = 0; // initialize encoder values
-int16_t renc_val = 0; // TODO: Where are these variables used?
-
 int l_halt_highlevel = 0;
 int r_halt_highlevel = 0;
 
@@ -134,7 +131,7 @@ void ROS_publisher() {
 }
 
 void lwheel_vtarget_callback(const std_msgs::Float32& msg) {
-    if ((r_halt_highlevel == 1) || (l_halt_highlevel == 1)) {
+    if ((r_halt_highlevel == 1) || (l_halt_highlevel == 1)) { // Check for either left or right motor stall to stop left motor
         l_pid.pid_target = 0;
     } else if ((r_halt_highlevel == 2) || (l_halt_highlevel == 2)) {
         l_pid.pid_target = -0.3;
@@ -144,7 +141,7 @@ void lwheel_vtarget_callback(const std_msgs::Float32& msg) {
 }
 
 void rwheel_vtarget_callback(const std_msgs::Float32& msg) {
-    if ((r_halt_highlevel == 1) || (l_halt_highlevel == 1)) { // TODO: Why are you checking both left and right when you're only setting the right?
+    if ((r_halt_highlevel == 1) || (l_halt_highlevel == 1)) { // Check for either left or right motor stall to stop right motor
         r_pid.pid_target = 0;
     } else if ((r_halt_highlevel == 2) || (l_halt_highlevel == 2)) {
         r_pid.pid_target = -0.3;
@@ -154,8 +151,6 @@ void rwheel_vtarget_callback(const std_msgs::Float32& msg) {
 }
 
 void encoder_reset_callback(const std_msgs::Empty& reset_msg) {
-    lenc_val = 0;
-    renc_val = 0;
     lmotor_encoder.write(0);
     rmotor_encoder.write(0);
 }

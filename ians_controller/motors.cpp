@@ -16,7 +16,7 @@ Motors(int pwm_Pin,int motor_direction_pin1,
 int motor_direction_pin2);
 */
 
-Motors::Motors(int pwm_pin, int motor_direction_pin1, int motor_direction_pin2) {
+motors::motors(int pwm_pin, int motor_direction_pin1, int motor_direction_pin2) {
     pinMode(pwm_pin, OUTPUT); //motor PWM pin
     pinMode(motor_direction_pin1, OUTPUT); //motor direction en1
     pinMode(motor_direction_pin2, OUTPUT); //motor direction en2
@@ -31,12 +31,12 @@ Motors::Motors(int pwm_pin, int motor_direction_pin1, int motor_direction_pin2) 
 /*
 
 */
-void Motors::motor_cmd(std_msgs::Float32 motor_speed) {
-    last_motor_cmd = motor_speed.data;
-    if (motor_speed.data > 0) { // TODO: No need for a ROS msg here, just take a float
-        motor_forward(motor_speed.data);
-    } else if (motor_speed.data < 0) {
-        motor_reverse(abs(motor_speed.data));
+void motors::motor_cmd(float motor_speed) {
+    last_motor_cmd = motor_speed;
+    if (motor_speed > 0) {
+        motor_forward(motor_speed);
+    } else if (motor_speed < 0) {
+        motor_reverse(abs(motor_speed));
     } else {
         motor_brake();
     }
@@ -50,7 +50,7 @@ void Motors::motor_cmd(std_msgs::Float32 motor_speed) {
 |    motor and sets directions pins to rotate motors forward
 void Motors::motor_forward(float motor_speed);
 */
-void Motors::motor_forward(float motor_speed) {
+void motors::motor_forward(float motor_speed) {
     analogWrite(PWM_pin, motor_speed);
     digitalWrite(m_dir1, HIGH);
     digitalWrite(m_dir2, LOW);
@@ -64,7 +64,7 @@ void Motors::motor_forward(float motor_speed) {
 |    motor and sets directions pins to rotate motors forward
 void Motors::motor_forward(float motor_speed);
 */
-void Motors::motor_reverse(float motor_speed) {
+void motors::motor_reverse(float motor_speed) {
     analogWrite(PWM_pin, motor_speed);
     digitalWrite(m_dir1, LOW);
     digitalWrite(m_dir2, HIGH);
@@ -78,19 +78,18 @@ void Motors::motor_reverse(float motor_speed) {
 |    and PWM duty cycle to zero to brake the motor
 void Motors::motor_brake();
 */
-void Motors::motor_brake() {
+void motors::motor_brake() {
     analogWrite(PWM_pin, 0);
     digitalWrite(m_dir1, LOW);
     digitalWrite(m_dir2, LOW);
 }
 
-void Motors::check_motor_stall(float curr_enocder_val) { // TODO: Please spell words correctly
+void motors::check_motor_stall(float curr_encoder_val) { // TODO: Please spell words correctly
     Serial.println("Begin State");
-    std_msgs::Float32 motorspeed;
 ///// begin wheel state machine ///
     switch (WheelCurrentState) {
     case (Moving):
-        newTicks = curr_enocder_val;
+        newTicks = curr_encoder_val;
         if  (last_motor_cmd != 0)  { // This state initializes the time and captures wheel position.
             WheelCurrentState = Stalled;
             timer = millis();
@@ -99,11 +98,11 @@ void Motors::check_motor_stall(float curr_enocder_val) { // TODO: Please spell w
 
     case (Stalled): // Checks if parameters of stall are met.
         Serial.println("Stalled");
-        if ( (curr_enocder_val == newTicks) && (last_motor_cmd != 0) && ((millis() - timer) > 1000) ) {
+        if ( (curr_encoder_val == newTicks) && (last_motor_cmd != 0) && ((millis() - timer) > 1000) ) {
             WheelCurrentState = TurnOff;
             timer = millis();
         }
-        if (curr_enocder_val != newTicks) {
+        if (curr_encoder_val != newTicks) {
             WheelCurrentState = Moving;
         }
         break;
@@ -112,8 +111,7 @@ void Motors::check_motor_stall(float curr_enocder_val) { // TODO: Please spell w
         Serial.print("You're in turn off state.");
         halt_highlevel = 1;
         Serial.print("\r\n");
-        motorspeed.data = 0;
-        motor_cmd(motorspeed);
+        motor_cmd(0);
         if ((millis() - timer) > 2500) {
             halt_highlevel = 2;
             WheelCurrentState = GoBack;

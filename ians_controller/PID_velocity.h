@@ -19,7 +19,7 @@
 
 class PID_velocity
 {
-        Motors motor;
+        motors motor;
         float pid_error;
         float pid_motor;
         float vel;
@@ -57,7 +57,7 @@ class PID_velocity
         void do_pid();
         void cumulative_enc_val(int enc);
         void pid_spin();
-        int check_motor_stall(float curr_enocder_val);
+        int check_motor_stall(float curr_encoder_val);
 };
 
 #endif
