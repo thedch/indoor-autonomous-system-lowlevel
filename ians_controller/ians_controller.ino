@@ -44,25 +44,22 @@ PID_velocity r_pid(RIGHT_PWM_PIN, RIGHT_MOTOR_EN1, RIGHT_MOTOR_EN2, KD, KP, KI, 
 IntervalTimer encoder_timer; // interrupt to publish encoder values
 IntervalTimer PID_timer; // interrupt to check PID loop
 
-int l_halt_highlevel = 0;
+int l_halt_highlevel = 0; // motor stalled flags
 int r_halt_highlevel = 0;
 
+//IMU
 IMU robot_imu;
 
 // ROS FUNCTIONS & VARIABLES
 ros::NodeHandle nh;
 std_msgs::Int16 lwheel_msg, rwheel_msg;
 std_msgs::Float32 quatz_msg, quatw_msg;
-//sensor_msgs::Imu IMU_msg;
 ros::Publisher lwheel("lwheel", &lwheel_msg);
 ros::Publisher rwheel("rwheel", &rwheel_msg);
-//ros::Publisher imu_data("imu_data", &IMU_msg);
 ros::Publisher quatz("quat_z", &quatz_msg);
 ros::Publisher quatw("quat_w", &quatw_msg);
-//ros::Publisher compass("compass", &MF_msg);
 void ROS_publisher();
 void run_PID();
-void check_motor_stall();
 
 // Callback headers to be used when a ROS topic publish is received
 void lwheel_vtarget_callback(const std_msgs::Float32& msg);
@@ -103,6 +100,7 @@ void run_PID() {
 }
 
 void ROS_publisher() {
+<<<<<<< HEAD
     // Send the odom to the Pi for the nav stack
     lwheel_msg.data = (lmotor_encoder.read() / 4);
     rwheel_msg.data = (rmotor_encoder.read() / 4);
@@ -128,6 +126,14 @@ void ROS_publisher() {
     // Update the PID controller with the current odom
     l_pid.cumulative_enc_val(lwheel_msg.data);
     r_pid.cumulative_enc_val(rwheel_msg.data);
+}
+
+void lmotor_callback(const std_msgs::Float32& msg) {
+  l_pid.test_motor_control(msg);
+}
+
+void rmotor_callback(const std_msgs::Float32& msg) {
+  r_pid.test_motor_control(msg);
 }
 
 void lwheel_vtarget_callback(const std_msgs::Float32& msg) {
