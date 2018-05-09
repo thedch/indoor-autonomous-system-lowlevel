@@ -2,7 +2,6 @@
 #include "PID_velocity.h"
 
 PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,float Kp,float Ki,float ticks_per_m) : motor(PWM_PIN, MOTOR_EN1, MOTOR_EN2){
-    pinMode(13, OUTPUT); // TODO: Is this needed?
     pid_error = 0;
     pid_target = 0;
     pid_motor = 0;
@@ -29,28 +28,20 @@ PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,floa
     encoder_low_wrap = (encoder_max - encoder_min) * 0.3 + encoder_min; // 10k
     encoder_high_wrap = (encoder_max - encoder_min) * 0.7 + encoder_min; // 22k
     wheel_latest = 0.0;   
-//    prev_vel[ROLLING_PTS] = { 0 }; // all elements 0
 }
 
 void PID_velocity::calc_velocity() {
     // check how much time has elapsed
     double dt_duration = millis() - then; // In milliseconds
-//    Serial.print("Inside calc vel, current dt: ");
-//    Serial.println(dt_duration);
     double dt = dt_duration / 1000; // Convert to seconds
     double cur_vel;
     
     if (wheel_latest == wheel_prev) {
-//        Serial.println("No new wheels ticks found in calc velocity");
         cur_vel = (1.0 / (double)ticks_per_meter) / dt;
-//            Serial.print("cur_vel");
-//           Serial.println(cur_vel);
         if (abs(cur_vel) < velocity_threshold) { // too slow
-//            Serial.println("IF too slow");
             append_vel(0);
             calc_rolling_vel();
         } else { // moving
-//            Serial.println("No wheel ticks found but simulated vel is high or something");
             if ((vel >= 0 && vel > cur_vel && cur_vel >= 0) ||
                     (vel < 0 && vel < cur_vel && cur_vel <= 0)) {
                 append_vel(cur_vel);
@@ -58,7 +49,6 @@ void PID_velocity::calc_velocity() {
             }
         }
     } else {      
-//        Serial.println("Found a tick inside calc velocity, calculating...");
         cur_vel = (wheel_latest - wheel_prev) / dt;
         append_vel(cur_vel);
         calc_rolling_vel();
@@ -70,8 +60,6 @@ void PID_velocity::calc_velocity() {
 // The prev_vel array is modeled as a FILO queue: elements are added at
 // index 0, and fall off the array at index ROLLING_PTS
 void PID_velocity::append_vel(double val) {
-//    Serial.print("Inside append vel: ");
-//    Serial.println(val);
     for (int i = 1; i < ROLLING_PTS; i++) {
         prev_vel[i] = prev_vel[i - 1];
     }
@@ -142,12 +130,11 @@ void PID_velocity::cumulative_enc_val(int enc) {
 void PID_velocity::pid_spin() {    
     calc_velocity();
     do_pid();
-    std_msgs::Float32 motor_msg; // TODO: This should be an int, correct? Also, no need for ROS msg, just send in raw data
-    motor_msg.data = pid_motor;
-    motor.motor_cmd(motor_msg);
+    motor.motor_cmd(pid_motor);
 }
 
-void PID_velocity::test_motor_control(std_msgs::Float32 msg){
-  motor.motor_cmd(msg);
+int PID_velocity::check_motor_stall(float curr_encoder_val){
+  motor.check_motor_stall(curr_encoder_val);
+  return motor.halt_highlevel;
 }
 
