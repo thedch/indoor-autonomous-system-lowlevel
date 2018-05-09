@@ -100,7 +100,6 @@ void run_PID() {
 }
 
 void ROS_publisher() {
-<<<<<<< HEAD
     // Send the odom to the Pi for the nav stack
     lwheel_msg.data = (lmotor_encoder.read() / 4);
     rwheel_msg.data = (rmotor_encoder.read() / 4);
@@ -126,14 +125,6 @@ void ROS_publisher() {
     // Update the PID controller with the current odom
     l_pid.cumulative_enc_val(lwheel_msg.data);
     r_pid.cumulative_enc_val(rwheel_msg.data);
-}
-
-void lmotor_callback(const std_msgs::Float32& msg) {
-  l_pid.test_motor_control(msg);
-}
-
-void rmotor_callback(const std_msgs::Float32& msg) {
-  r_pid.test_motor_control(msg);
 }
 
 void lwheel_vtarget_callback(const std_msgs::Float32& msg) {
