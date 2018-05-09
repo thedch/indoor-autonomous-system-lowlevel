@@ -85,7 +85,6 @@ void motors::motor_brake() {
 }
 
 void motors::check_motor_stall(float curr_encoder_val) { // TODO: Please spell words correctly
-    Serial.println("Begin State");
 ///// begin wheel state machine ///
     switch (WheelCurrentState) {
     case (Moving):
@@ -97,7 +96,6 @@ void motors::check_motor_stall(float curr_encoder_val) { // TODO: Please spell w
         break;
 
     case (Stalled): // Checks if parameters of stall are met.
-        Serial.println("Stalled");
         if ( (curr_encoder_val == newTicks) && (last_motor_cmd != 0) && ((millis() - timer) > 1000) ) {
             WheelCurrentState = TurnOff;
             timer = millis();
@@ -108,7 +106,6 @@ void motors::check_motor_stall(float curr_encoder_val) { // TODO: Please spell w
         break;
 
     case (TurnOff):
-        Serial.print("You're in turn off state.");
         halt_highlevel = 1;
         Serial.print("\r\n");
         motor_cmd(0);
