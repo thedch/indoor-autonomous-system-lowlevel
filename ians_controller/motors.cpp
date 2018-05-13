@@ -84,7 +84,7 @@ void motors::motor_brake() {
     digitalWrite(m_dir2, LOW);
 }
 
-void motors::check_motor_stall(float curr_encoder_val) { // TODO: Please spell words correctly
+void motors::check_motor_stall(float curr_encoder_val) { 
 ///// begin wheel state machine ///
     switch (WheelCurrentState) {
     case (Moving):
