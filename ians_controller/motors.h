@@ -27,7 +27,7 @@ class motors
     motors(int pwm_Pin, int motor_direction_pin1, int motor_direction_pin2);
     void motor_cmd(float motor_speed);
     void check_motor_stall(float curr_encoder_val);
-    int halt_highlevel;
+    int halt_highlevel; // Used to check if high level wheel control is enabled or disabled. 
 };
 
 #endif
