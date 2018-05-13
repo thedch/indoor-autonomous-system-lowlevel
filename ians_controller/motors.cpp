@@ -23,8 +23,8 @@ motors::motors(int pwm_pin, int motor_direction_pin1, int motor_direction_pin2) 
     PWM_pin = pwm_pin;
     m_dir1 = motor_direction_pin1;
     m_dir2 = motor_direction_pin2;
-    timer = 0; // Time variable for wheel
-    newTicks = 0; // Used to capture initial right wheel position
+    timer = 0; // Time variable for wheel stall state machine.
+    newTicks = 0; // Snapshot of encoder value. Used to check for a stall
     halt_highlevel = 0;
 }
 
@@ -105,19 +105,19 @@ void motors::check_motor_stall(float curr_encoder_val) {
         }
         break;
 
-    case (TurnOff):
-        halt_highlevel = 1;
+    case (TurnOff): // This state disables high level commands and stop motors
+        halt_highlevel = 1; // Flag to indiate to turn the motors off. 
         Serial.print("\r\n");
         motor_cmd(0);
         if ((millis() - timer) > 2500) {
-            halt_highlevel = 2;
+            halt_highlevel = 2;  // Flag to indicate motors should go in reverse 
             WheelCurrentState = GoBack;
             timer = millis();
         }
         break;
     case (GoBack):
         if ((millis() - timer) > 3000) {
-            halt_highlevel = 0;
+            halt_highlevel = 0; // Flag that indicates to enable high level commands
             WheelCurrentState = Moving;
         }
         break;
