@@ -71,3 +71,9 @@ Motors.h is the API used set motor power and direction of the differential drive
 * **myMotor.leftMotorReverse(motorSpeed)** - Input it is PWM parameter from 0 - 255
 * **myMotor.leftMotorBrake()** - Left Motor brakes
 * **myMotor.rightMotorBrake()** - Right Motor brakes   
+
+## Wheel Stall State Machine
+The wheel stall state machine is implemented to protect the hardware from current surges that occur when the wheels stall.
+Shown below is the state diagram of how this works. 
+
+![Wheel Stall State Machine](./Images/WheelStallSM.png)
