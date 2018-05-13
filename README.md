@@ -77,3 +77,5 @@ The wheel stall state machine is implemented to protect the hardware from curren
 Shown below is the state diagram of how this works. 
 
 ![Wheel Stall State Machine](./Images/WheelStallSM.png)
+
+The first state captures the current encoder position of each wheel and a time reference. The next state will compare real time encoder positions to the snapshots taken in the previous state to determine if a stall has occured. If a stall has occured the high-level commands will be disabled and the robot will turn off its motors. The final state will make the robot go in reverse for a few seconds. After this time has passed the robot will then be able to receive high-level commands and continue it route. 
