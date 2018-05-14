@@ -13,11 +13,6 @@ std::tuple<std_msgs::Float32, std_msgs::Float32>  IMU::read_IMUmsg_data() {
     std_msgs::Float32 quatw, quatz;
     quatw.data = (float) quat.w();
     quatz.data = (float) quat.z();
-    Serial.print("QuatW: ");
-    Serial.print(quatw.data);
-    Serial.print(" QuatZ: ");
-    Serial.println(quatz.data);
-
     return std::make_tuple(quatw, quatz);
 }
 
