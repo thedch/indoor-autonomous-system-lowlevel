@@ -13,24 +13,6 @@ std::tuple<std_msgs::Float32, std_msgs::Float32> IMU::read_IMUmsg_data() {
     std_msgs::Float32 quatw, quatz;
     quatw.data = (float) quat.w();
     quatz.data = (float) quat.z();
-
-//    //Calibration test
-//    uint8_t system, gyro, accel, mag;
-//    system = gyro = accel = mag = 0;
-//    bno.getCalibration(&system, &gyro, &accel, &mag);
-//    Serial.print("\t");
-//    if (!system)
-//    {
-//      Serial.print("! ");
-//    }
-//
-//    Serial.println(mag,DEC);
-//    
-//    Serial.print("QuatW: ");
-//    Serial.print(quatw.data);
-//    Serial.print(" QuatZ: ");
-//    Serial.println(quatz.data);
-//    read_compass();
     
     return std::make_tuple(quatw, quatz);
 }
