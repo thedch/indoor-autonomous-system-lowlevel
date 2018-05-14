@@ -1,3 +1,11 @@
+/*
+  IMU.h - This library is used read absolute orientation (quaternion)
+  with respect to north and return the w and z component in a tuple.
+  Dependencies : ros.h - This library provides Float32 ROS message type. 
+  This data type is passed through to set PWM duty cyle.
+  Created by Juan Huerta and Kevin Beher 
+*/
+
 #ifndef IMU_H
 #define IMU_H
 
