@@ -8,7 +8,7 @@ IMU::IMU() {
 }
 
 /*
-| Author: Juan Huerta
+| Author: Juan Huerta and Daniel Hunter
 | Return: tuple conataining the quatw and quatz
 | Remark: Reads absolute orientation(quaternion) values and returns w
 |   and z components
@@ -24,7 +24,7 @@ std::tuple<std_msgs::Float32, std_msgs::Float32> IMU::read_IMUmsg_data() {
 }
 
 /*
-| Author: Juan Huerta
+| Author: Juan Huerta and Kevin Beher
 | Return: Void
 | Remark: Reads magnetometer value and converts it to degrees with respect to North
 */
