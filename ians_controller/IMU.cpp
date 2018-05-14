@@ -17,6 +17,11 @@ std::tuple<std_msgs::Float32, std_msgs::Float32> IMU::read_IMUmsg_data() {
     return std::make_tuple(quatw, quatz);
 }
 
+/*
+| Author: Juan Huerta
+| Return: Void
+| Remark: Reads magnetometer value and converts it to degrees with respect to North
+*/
 void IMU::read_compass() {
     //sensor_msgs::Compass Compass_msg;
     imu::Vector<3> magnetometer = bno.getVector(Adafruit_BNO055::VECTOR_MAGNETOMETER);
