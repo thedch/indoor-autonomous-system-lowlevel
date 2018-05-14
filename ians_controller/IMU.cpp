@@ -7,6 +7,12 @@ IMU::IMU() {
     bno.setExtCrystalUse(true);
 }
 
+/*
+| Author: Juan Huerta
+| Return: tuple conataining the quatw and quatz
+| Remark: Reads absolute orientation(quaternion) values and returns w
+|   and z components
+*/
 std::tuple<std_msgs::Float32, std_msgs::Float32> IMU::read_IMUmsg_data() {
 
     imu::Quaternion quat = bno.getQuat();
