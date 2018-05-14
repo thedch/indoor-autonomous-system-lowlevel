@@ -84,7 +84,7 @@ void motors::motor_brake() {
 }
 
 /*
-| Author: Juan Huerta
+| Author: Kevin Beher and Juan Huerta
 | Param: curr_encoder_val
 | Return: Void
 | Remark: State machine that checks for motor stalling. Does this by checking
