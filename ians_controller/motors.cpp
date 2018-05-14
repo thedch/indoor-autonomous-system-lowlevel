@@ -26,7 +26,12 @@ motors::motors(int pwm_pin, int motor_direction_pin1, int motor_direction_pin2) 
 }
 
 /*
-
+| Author: Juan Huerta
+| Param:  Positive or negative PWM value
+| Remark: Calls motor_forward if motor_speed in positive,
+|         calls motor_reverse if motor_speed is negative,
+|         calls motor_brake if motor_speed is zero
+|         updates last_motor_cmd variable with last past motor_speed.
 */
 void motors::motor_cmd(float motor_speed) {
     last_motor_cmd = motor_speed;
@@ -78,6 +83,14 @@ void motors::motor_brake() {
     digitalWrite(m_dir2, LOW);
 }
 
+/*
+| Author: Juan Huerta
+| Param: curr_encoder_val
+| Return: Void
+| Remark: State machine that checks for motor stalling. Does this by checking
+|     what the last_motor_cmd is set as and if its not zero and encoder values
+|     haven't changed the sets flag that motors have stalled.
+*/
 void motors::check_motor_stall(float curr_encoder_val) {
     switch (WheelCurrentState) {
     case (Moving):
