@@ -99,7 +99,7 @@ void motors::check_motor_stall(float curr_encoder_val) {
         break;
 
     case (TurnOff): // This state disables high level commands and stop motors
-        halt_highlevel = 1; // Flag to indiate to turn the motors off.
+        halt_highlevel = 1; // Flag to indicate to turn the motors off.
         Serial.print("\r\n");
         motor_cmd(0);
         if ((millis() - timer) > 2500) {
