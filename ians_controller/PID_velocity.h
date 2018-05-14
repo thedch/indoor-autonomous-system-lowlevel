@@ -1,8 +1,12 @@
 /*
-  Motors.h - This library is used to set motor speed and direction
-  Dependencies : ros.h - This library provides Float32 ROS message type.
+  PID_velocity.h - This library is used as a feedback control loop for the
+  motors. It uses encoder values to calculate velocity of the robot. It calculates 
+  error from desired velocity and measured and applies correction based on proportional,
+  intergral and derivative terms.
+  Dependencies : ros.h - This library provides Float32 ROS message type. motors.h - used to apply motor
+  commands.  
   This data type is passed through to set PWM duty cyle.
-  Created by Juan Huerta, Kevin Beher, Kelvin Silva
+  Created by Juan Huerta, Daniel Hunter
 */
 
 #ifndef PID_VELOCITY_H
