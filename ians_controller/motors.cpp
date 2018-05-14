@@ -12,10 +12,7 @@
 |    motor direction and direction enables
 | Remark: This constructor sets the pin numbers given as private
 |    variables of the class
-Motors(int pwm_Pin,int motor_direction_pin1,
-int motor_direction_pin2);
 */
-
 motors::motors(int pwm_pin, int motor_direction_pin1, int motor_direction_pin2) {
     pinMode(pwm_pin, OUTPUT); //motor PWM pin
     pinMode(motor_direction_pin1, OUTPUT); //motor direction en1
@@ -47,8 +44,7 @@ void motors::motor_cmd(float motor_speed) {
 | Param: motor_speed, 0-255
 | Return: Void
 | Remark: This function sets PWM duty cycle of the right
-|    motor and sets directions pins to rotate motors forward
-void Motors::motor_forward(float motor_speed);
+|    motor and sets directions pins to rotate the motor forward
 */
 void motors::motor_forward(float motor_speed) {
     analogWrite(PWM_pin, motor_speed);
@@ -61,8 +57,7 @@ void motors::motor_forward(float motor_speed) {
 | Param: motor_speed, 0-255
 | Return: Void
 | Remark: This function sets PWM duty cycle of the right
-|    motor and sets directions pins to rotate motors forward
-void Motors::motor_forward(float motor_speed);
+|    motor and sets directions pins to rotate the motor in reverse
 */
 void motors::motor_reverse(float motor_speed) {
     analogWrite(PWM_pin, motor_speed);
@@ -76,7 +71,6 @@ void motors::motor_reverse(float motor_speed) {
 | Return: Void
 | Remark: This function sets motor direction pins to zero
 |    and PWM duty cycle to zero to brake the motor
-void Motors::motor_brake();
 */
 void motors::motor_brake() {
     analogWrite(PWM_pin, 0);
@@ -84,8 +78,7 @@ void motors::motor_brake() {
     digitalWrite(m_dir2, LOW);
 }
 
-void motors::check_motor_stall(float curr_encoder_val) { 
-///// begin wheel state machine ///
+void motors::check_motor_stall(float curr_encoder_val) {
     switch (WheelCurrentState) {
     case (Moving):
         newTicks = curr_encoder_val;
@@ -106,11 +99,11 @@ void motors::check_motor_stall(float curr_encoder_val) {
         break;
 
     case (TurnOff): // This state disables high level commands and stop motors
-        halt_highlevel = 1; // Flag to indiate to turn the motors off. 
+        halt_highlevel = 1; // Flag to indiate to turn the motors off.
         Serial.print("\r\n");
         motor_cmd(0);
         if ((millis() - timer) > 2500) {
-            halt_highlevel = 2;  // Flag to indicate motors should go in reverse 
+            halt_highlevel = 2;  // Flag to indicate motors should go in reverse
             WheelCurrentState = GoBack;
             timer = millis();
         }
