@@ -31,7 +31,7 @@ PID_velocity::PID_velocity(int PWM_PIN,int MOTOR_EN1,int MOTOR_EN2,float Kd,floa
 }
 
 /*
-| Author: Juan Huerta
+| Author: Juan Huerta and Daniel Hunter
 | Return: Void
 | Remark: Function that calculates the current wheel velocity
 */
@@ -63,7 +63,7 @@ void PID_velocity::calc_velocity() {
 }
 
 /*
-| Author: Juan Huerta
+| Author: Daniel Hunter
 | Param: current velocity value
 | Return: Void
 | Remark: Appends current velocity to an array holding previous velocity values.
@@ -79,7 +79,7 @@ void PID_velocity::append_vel(double val) {
 }
 
 /*
-| Author: Juan Huerta
+| Author: Daniel Hunter 
 | Return: Void
 | Remark: Calculates the average rolling velocity
 */
@@ -92,7 +92,7 @@ void PID_velocity::calc_rolling_vel() {
 }
 
 /*
-| Author: Juan Huerta
+| Author: Juan Huerta and Daniel Hunter
 | Return: Void
 | Remark: calculates pid_motor function 
 */
@@ -126,7 +126,7 @@ void PID_velocity::do_pid() {
 }
 
 /*
-| Author: Juan Huerta
+| Author: Juan Huerta and Daniel Hunter
 | Param: enc
 | Return: Void
 | Remark: Takes current encoder value and updates cumulative encoder value to account
@@ -145,7 +145,7 @@ void PID_velocity::cumulative_enc_val(int enc) {
 }
 
 /*
-| Author: Juan Huerta
+| Author: Juan Huerta and Daniel Hunter
 | Return: Void
 | Remark: Calculates the current velocity and runs the pid. Calls motor_cmd 
 |       from motor API to apply PWM calculcated by PID
