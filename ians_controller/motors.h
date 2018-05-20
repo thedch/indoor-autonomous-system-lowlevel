@@ -7,6 +7,9 @@
 
 #ifndef MOTORS_H
 #define MOTORS_H
+#define STALL_TIME 1000
+#define OFF_TIME 2500
+#define BACKUP_TIME 3000
 
 #include "Arduino.h"
 #include <ros.h>
@@ -27,7 +30,7 @@ class motors
     float last_motor_cmd;
     enum WheelState { //State for wheel
       Moving,
-      Stalled,
+      Check4Stall,
       TurnOff,
       GoBack  
     };

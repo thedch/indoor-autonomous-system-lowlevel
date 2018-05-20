@@ -96,13 +96,13 @@ void motors::check_motor_stall(float curr_encoder_val) {
     case (Moving):
         newTicks = curr_encoder_val;
         if  (last_motor_cmd != 0)  { // This state initializes the time and captures wheel position.
-            WheelCurrentState = Stalled;
+            WheelCurrentState = Check4Stall;
             timer = millis();
         }
         break;
 
-    case (Stalled): // Checks if parameters of stall are met.
-        if ( (curr_encoder_val == newTicks) && (last_motor_cmd != 0) && ((millis() - timer) > 1000) ) {
+    case (Check4Stall): // Checks if parameters of stall are met.
+        if ( (curr_encoder_val == newTicks) && (last_motor_cmd != 0) && ((millis() - timer) > STALL_TIME) ) {
             WheelCurrentState = TurnOff;
             timer = millis();
         }
@@ -115,14 +115,14 @@ void motors::check_motor_stall(float curr_encoder_val) {
         halt_highlevel = 1; // Flag to indicate to turn the motors off.
         Serial.print("\r\n");
         motor_cmd(0);
-        if ((millis() - timer) > 2500) {
+        if ((millis() - timer) > OFF_TIME) {
             halt_highlevel = 2;  // Flag to indicate motors should go in reverse
             WheelCurrentState = GoBack;
             timer = millis();
         }
         break;
     case (GoBack):
-        if ((millis() - timer) > 3000) {
+        if ((millis() - timer) > BACKUP_TIME) {
             halt_highlevel = 0; // Flag that indicates to enable high level commands
             WheelCurrentState = Moving;
         }
