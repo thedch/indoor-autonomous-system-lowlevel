@@ -45,8 +45,8 @@ ians_controller.ino is the main file that handles calling the Motors API and the
 
 Dependecies:
 
-1. [ros.h](http://wiki.ros.org/roslib)
-1. [Encoders.h](https://github.com/PaulStoffregen/Encoder)
+* [ros.h](http://wiki.ros.org/roslib)
+* [Encoders.h](https://github.com/PaulStoffregen/Encoder)
 
 ### ros.h
 ros.h is a ROS library for Arduino that is used to set up the ROS functions that subscribe and publish to topics on the ROS system of the Raspberry Pi.
@@ -56,16 +56,23 @@ ros.h is a ROS library for Arduino that is used to set up the ROS functions that
 Encoders.h is a library made for the Teensy that is used to count pulses from quadrature encoded signals.
 ians_controller.ino uses the functions:
 
-* **Encoder myEnc(pin1, pin2)** - Creates an Encoder object, using 2 pins.
-* **myEnc.read()** - Returns the positive or negative accumulated position.
-* **myEnc.write(newPosition)** - Set the position to a new value.
+* **Encoder my_enc(pin1, pin2)** - Creates an Encoder object, using 2 pins.
+* **my_enc.read()** - Returns the positive or negative accumulated position.
+* **my_enc.write(newPosition)** - Set the position to a new value.
 
+## pid_velocity.h
+pid_velocity.h is the API used to create a motors object with a PID controller overlayed on top. ians_controller.ino sets the target velocity of the motors in meters per second then uses the encoders library to read current encoder value and call cumulative_enc_val to update the cumulative encoder value. The cumulative encoder value is used in calculating the current velocity and apply correction to the motor.
 
-### Motors.h
-Motors.h is the API used set motor power and direction of the differential drive robot.
+* **PID_velocity my_pid(PWM_PIN, MOTOR_EN1, MOTOR_EN2, KD, KP, KI, TICKS_PER_METER)** - Creates a Motors object using the pins connected from the H-bridge to the Teensy.
+* **my_pid.pid_target = target_value** - Sets the new target for velocity in m/s for the motor
+* **my_pid.cumulative_enc_val(enc_value)** - Pass value read from encoder to update cumulative encoder value. 
+* **my_pid.pid_spin()** - Calculates current average velocity using encoders and error with respect to pid_target and applies correction to motors
 
-* **Motors myMotor(pwm_Pin, motor_direction_pin1, motor_direction_pin2)** - Creates a Motors object using the pins connected from the H-bridge to the Teensy.
-* **myMotor.motor_cmd(motorSpeed)** - Input it is PWM parameter from -255 to 255
+## motors.h
+motors.h is the API used set motor power and direction of the differential drive robot.
+
+* **motors my_motor(pwm_Pin, motor_direction_pin1, motor_direction_pin2)** - Creates a Motors object using the pins connected from the H-bridge to the Teensy.
+* **my_motor.motor_cmd(motorSpeed)** - Input it is PWM parameter from -255 to 255
 
 ### Wheel Stall State Machine
 The wheel stall state machine is implemented to protect the hardware from current surges that occur when the wheels stall.
@@ -74,3 +81,10 @@ Shown below is the state diagram of how this works.
 ![Wheel Stall State Machine](./images/WheelStallSM.png)
 
 The first state captures the current encoder position of each wheel and a time reference. The next state will compare real time encoder positions to the snapshots taken in the previous state to determine if a stall has occured. If a stall has occured the high-level commands will be disabled and the robot will turn off its motors. The final state will make the robot go in reverse for a few seconds. After this time has passed the robot will then be able to receive high-level commands and continue it route.
+
+## IMU.h
+IMU.h is the API used read absolute orientation of the robot from the IMU.
+
+* **IMU my_IMU** - Creates a Motors object using the pins connected from the H-bridge to the Teensy.
+  **my_imu.read_IMUmsg_data()** - Returns absolute orientation quaternion w and z components in a tuple.
+
