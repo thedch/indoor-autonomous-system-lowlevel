@@ -7,6 +7,9 @@
 
 #ifndef MOTORS_H
 #define MOTORS_H
+#define STALL_TIME 1000
+#define OFF_TIME 2500
+#define BACKUP_TIME 3000
 
 #include "Arduino.h"
 #include <ros.h>
@@ -23,21 +26,21 @@ class motors
     void motor_reverse(float motor_speed);
     void motor_brake(); 
     int timer; // Time variable for wheel
-    int newTicks; // Used to capture initial right wheel pos
+    int new_ticks; // Used to capture initial right wheel pos
     float last_motor_cmd;
-    enum WheelState { //State for wheel
-      Moving,
-      Stalled,
-      TurnOff,
-      GoBack  
+    enum wheel_state { //State for wheel
+      moving,
+      check_for_stall,
+      turn_off,
+      go_back  
     };
-    enum WheelState WheelCurrentState = Moving;
+    enum wheel_state wheel_current_state = moving;
   
   public:
     motors(int pwm_Pin, int motor_direction_pin1, int motor_direction_pin2);
     void motor_cmd(float motor_speed);
     void check_motor_stall(float curr_encoder_val);
-    int halt_highlevel;
+    int halt_highlevel; // Used to check if high level wheel control is enabled or disabled. 
 };
 
 #endif
