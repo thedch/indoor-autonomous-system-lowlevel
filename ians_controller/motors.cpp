@@ -21,7 +21,7 @@ motors::motors(int pwm_pin, int motor_direction_pin1, int motor_direction_pin2) 
     m_dir1 = motor_direction_pin1;
     m_dir2 = motor_direction_pin2;
     timer = 0; // Time variable for wheel stall state machine.
-    newTicks = 0; // Snapshot of encoder value. Used to check for a stall
+    new_ticks = 0; // Snapshot of encoder value. Used to check for a stall
     halt_highlevel = 0;
 }
 
@@ -92,39 +92,39 @@ void motors::motor_brake() {
 |     haven't changed the sets flag that motors have stalled.
 */
 void motors::check_motor_stall(float curr_encoder_val) {
-    switch (WheelCurrentState) {
-    case (Moving):
-        newTicks = curr_encoder_val;
+    switch (wheel_current_state) {
+    case (moving):
+        new_ticks = curr_encoder_val;
         if  (last_motor_cmd != 0)  { // This state initializes the time and captures wheel position.
-            WheelCurrentState = Check4Stall;
+            wheel_current_state = check_for_stall;
             timer = millis();
         }
         break;
 
-    case (Check4Stall): // Checks if parameters of stall are met.
-        if ( (curr_encoder_val == newTicks) && (last_motor_cmd != 0) && ((millis() - timer) > STALL_TIME) ) {
-            WheelCurrentState = TurnOff;
+    case (check_for_stall): // Checks if parameters of stall are met.
+        if ( (curr_encoder_val == new_ticks) && (last_motor_cmd != 0) && ((millis() - timer) > STALL_TIME) ) {
+            wheel_current_state = turn_off;
             timer = millis();
         }
-        if (curr_encoder_val != newTicks) {
-            WheelCurrentState = Moving;
+        if (curr_encoder_val != new_ticks) {
+            wheel_current_state = moving;
         }
         break;
 
-    case (TurnOff): // This state disables high level commands and stop motors
+    case (turn_off): // This state disables high level commands and stop motors
         halt_highlevel = 1; // Flag to indicate to turn the motors off.
         Serial.print("\r\n");
         motor_cmd(0);
         if ((millis() - timer) > OFF_TIME) {
             halt_highlevel = 2;  // Flag to indicate motors should go in reverse
-            WheelCurrentState = GoBack;
+            wheel_current_state = moving;
             timer = millis();
         }
         break;
-    case (GoBack):
+    case (go_back):
         if ((millis() - timer) > BACKUP_TIME) {
             halt_highlevel = 0; // Flag that indicates to enable high level commands
-            WheelCurrentState = Moving;
+            wheel_current_state = moving;
         }
         break;
     default:
