@@ -49,8 +49,59 @@ Dependecies:
 * [Encoders.h](https://github.com/PaulStoffregen/Encoder)
 
 ### ros.h
-ros.h is a ROS library for Arduino that is used to set up the ROS functions that subscribe and publish to topics on the ROS system of the Raspberry Pi.
+ros.h is a ROS library for Arduino that is used to set up the ROS functions that subscribe and publish to topics on the ROS system of the Raspberry Pi. Below is an example on how to create ROS publisher and subscriber functions within a ROS project.
 
+ ```
+  #include <ros.h>
+  #include <std_msgs/String.h>
+  #include <std_msgs/Empty.h>
+  // LINK FOR MORE EXAMPLES
+  // http://wiki.ros.org/rosserial_arduino/Tutorials/
+ 
+  //ROS Node Handler
+  ros::NodeHandle nh;
+ 
+  // Callback headers to be used when a ROS topic publish is received
+  void toggle_callback(const std_msgs::Empty& toggle_msg);
+  
+  /* ROS Subcriber Template Function
+     Function can be named anything
+     First arguement says it will subscribe to toggle_led topic
+     Second arguement is callback that is triggered when a message is published
+     to toggle_led topic */
+  ros::Subscriber<std_msgs::Empty> toggle_led_sub("toggle_led", &toggle_callback);
+  
+  /* ROS Publisher Template Function
+     Function can be named anything
+     First arguement says it will publish to chatter topic
+     Second arguement is reference to message instance to be used for publishing */
+  std_msgs::String str_msg;
+  ros::Publisher chatter_pub("chatter", &str_msg);
+  
+  // Create hellow world string
+  char hello[13] = "hello world!";
+   
+  void setup()
+  {
+    pinMode(13,OUTPUT);
+    nh.initNode(); // Instantiate node handler
+    nh.advertise(chatter_pub); //initialize chatter topic
+    nh.subscribe(toggle_led_sub); //initialize toggle_led topic
+  }
+   
+  void loop()
+  {
+    str_msg.data = hello; // Populate str_msg struct's data field with hello string 
+    chatter.publish(&str_msg); // Publish string to chatter topic. Place where you want message to be published
+    nh.spinOnce(); // all ROS communication callbacks are handled
+    delay(1000); // Delay prevents queue overflow from continuous publishing over serial
+  }
+  
+  //CALLBACK FUNCTION LOGIC
+  void message_callback(const std_msgs::Empty& toggle_msg){
+      digitalWrite(13, HIGH-digitalRead(13));   // blink the led
+  }
+```
 
 ### Encoders.h
 Encoders.h is a library made for the Teensy that is used to count pulses from quadrature encoded signals.
