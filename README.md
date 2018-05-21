@@ -64,17 +64,21 @@ ros.h is a ROS library for Arduino that is used to set up the ROS functions that
   // Callback headers to be used when a ROS topic publish is received
   void toggle_callback(const std_msgs::Empty& toggle_msg);
   
-  /* ROS Subcriber Template Function
+  /* 
+     ROS Subcriber Template Function
      Function can be named anything
      First arguement says it will subscribe to toggle_led topic
      Second arguement is callback that is triggered when a message is published
-     to toggle_led topic */
+     to toggle_led topic 
+  */
   ros::Subscriber<std_msgs::Empty> toggle_led_sub("toggle_led", &toggle_callback);
   
-  /* ROS Publisher Template Function
+  /* 
+     ROS Publisher Template Function
      Function can be named anything
      First arguement says it will publish to chatter topic
-     Second arguement is reference to message instance to be used for publishing */
+     Second arguement is reference to message instance to be used for publishing 
+  */
   std_msgs::String str_msg;
   ros::Publisher chatter_pub("chatter", &str_msg);
   
